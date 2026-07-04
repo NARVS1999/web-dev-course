@@ -50,7 +50,7 @@ GET    /api/categories        # List categories</code></pre>
       <h2>Part 2: Backend — Laravel API</h2>
 
       <h3>Setup</h3>
-      <pre><code>composer create-project laravel/laravel task-manager-api
+      <pre><code>composer create-project laravel/laravel "^11.0" task-manager-api
 cd task-manager-api
 php artisan make:model Task -m
 php artisan make:model Category -m
@@ -90,7 +90,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });</code></pre>
 
       <h2>Part 3: Frontend — Next.js</h2>
-      <p>Gumawa ng Next.js project at ikonek ito sa Laravel API:</p>
+      <p>Gumawa ng Next.js project (v15.x, Pages Router) at ikonek ito sa Laravel API:</p>
 
       <pre><code>npx create-next-app@latest task-manager-web
 cd task-manager-web</code></pre>
@@ -154,7 +154,7 @@ export default function Tasks() {
 }</code></pre>
 
       <h2>Part 4: Mobile — React Native</h2>
-      <p>Gumawa ng Expo project at gamitin ang navigation at API integration na natutunan mo:</p>
+      <p>Gumawa ng Expo project (Expo SDK 52) at gamitin ang navigation at API integration na natutunan mo:</p>
 
       <pre><code>npx create-expo-app@latest task-manager-mobile
 cd task-manager-mobile
@@ -219,6 +219,13 @@ export default API_URL;
         </ul>
         <p>Pumili ka ng sarili mong project idea kung gusto mo — ang mahalaga ay may <strong>Laravel API + Next.js frontend + React Native mobile</strong>.</p>
       </div>
+
+    <h2>📖 Recommended Resources</h2>
+    <ul>
+      <li><a href="https://laravel.com/docs/sanctum" target="_blank">Laravel Docs: Sanctum</a> — API authentication para sa task manager</li>
+      <li><a href="https://nextjs.org/docs/pages/building-your-application/data-fetching" target="_blank">Next.js Docs: Data Fetching</a> — Para sa frontend data fetching</li>
+      <li><a href="https://reactnavigation.org/docs/getting-started" target="_blank">React Navigation Docs</a> — Para sa mobile app navigation</li>
+    </ul>
 
       <!-- ======== SUMMARY ======== -->
       <h2>Summary</h2>
