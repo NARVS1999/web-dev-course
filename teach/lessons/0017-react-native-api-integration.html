@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0017: React Native API Integration</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="lesson-layout">
+  <aside class="lesson-sidebar" id="lesson-sidebar"></aside>
+  <main class="lesson-main">
+    <div class="lesson-container">
+
+      <h1>Lesson 0017: React Native API Integration</h1>
+      <p><em>Ikonek ang iyong React Native app sa iyong Laravel API at mag-ipon ng data offline gamit ang AsyncStorage.</em></p>
+
+      <div class="info">
+        <strong>Lesson Goal</strong>
+        Matutunan kung paano mag-fetch ng data mula sa Laravel API, mag-display ng lists gamit ang FlatList, at mag-save ng data locally gamit ang AsyncStorage.
+      </div>
+
+      <h2>Part 1: Setup — API Configuration</h2>
+      <p>Gumawa tayo ng configuration file para sa API URL. Sa development, ito ay <code>localhost:8000</code>.</p>
+
+      <pre><code>// config.js
+const API_URL = 'http://localhost:8000/api';
+export default API_URL;</code></pre>
+
+      <div class="warning">
+        <strong>Android Emulator Note</strong>
+        Kung gumagamit ka ng Android emulator, <code>localhost</code> ay hindi tutugma sa iyong machine — gamitin ang <code>10.0.2.2</code> sa halip:<br>
+        <code>const API_URL = 'http://10.0.2.2:8000/api';</code><br>
+        Sa physical phone naman, gamitin ang IP address ng iyong computer (hal. <code>http://192.168.1.5:8000/api</code>).
+      </div>
+
+      <h2>Part 2: Fetching Data with FlatList</h2>
+      <p>Ang <code>FlatList</code> ay ang React Native na bersyon ng HTML lists — optimized para sa malalaking lists na may scroll at performance.</p>
+
+      <pre><code>// screens/BlogListScreen.js
+import { useState, useEffect } from 'react';
+import {
+  View, Text, FlatList, ActivityIndicator,
+  TouchableOpacity, StyleSheet,
+} from 'react-native';
+import API_URL from '../config';
+
+export default function BlogListScreen({ navigation }) {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_URL}/posts`)
+      .then(res =&gt; res.json())
+      .then(data =&gt; {
+        setPosts(data.data || data);
+        setLoading(false);
+      })
+      .catch(err =&gt; {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      &lt;View style={styles.center}&gt;
+        &lt;ActivityIndicator size="large" color="#2563eb" /&gt;
+      &lt;/View&gt;
+    );
+  }
+
+  return (
+    &lt;FlatList
+      data={posts}
+      keyExtractor={item =&gt; item.id.toString()}
+      renderItem={({ item }) =&gt; (
+        &lt;TouchableOpacity
+          style={styles.card}
+          onPress={() =&gt; navigation.navigate('BlogDetail', { id: item.id })}
+        &gt;
+          &lt;Text style={styles.title}&gt;{item.title}&lt;/Text&gt;
+          &lt;Text style={styles.body} numberOfLines={2}&gt;{item.body}&lt;/Text&gt;
+        &lt;/TouchableOpacity&gt;
+      )}
+    /&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  card: {
+    backgroundColor: '#fff',
+    padding: 16,
+    marginHorizontal: 16,
+    marginVertical: 8,
+    borderRadius: 8,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  title: { fontSize: 18, fontWeight: 'bold', marginBottom: 4 },
+  body: { fontSize: 14, color: '#666' },
+});</code></pre>
+
+      <div class="tip">
+        <strong>FlatList features</strong>
+        May built-in na <code>onEndReached</code> (para sa infinite scroll/pagination), <code>refreshControl</code> (para sa pull-to-refresh), at <code>ListHeaderComponent</code>/<code>ListEmptyComponent</code>.
+      </div>
+
+      <h2>Part 3: Creating Data (POST)</h2>
+      <p>Gamitin ang <code>fetch</code> para mag-send ng data sa API:</p>
+
+      <pre><code>const createPost = async (title, body) =&gt; {
+  try {
+    const res = await fetch(`${API_URL}/posts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, // kung may auth
+      },
+      body: JSON.stringify({ title, body }),
+    });
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error('Error creating post:', err);
+  }
+};</code></pre>
+
+      <h2>Part 4: AsyncStorage — Local Data</h2>
+      <p>Ang <strong>AsyncStorage</strong> ay parang localStorage sa web — nagse-save ng data sa iyong phone. Gamitin ito para sa caching, user preferences, o offline data.</p>
+
+      <p>I-install muna:</p>
+      <pre><code>npx expo install @react-native-async-storage/async-storage</code></pre>
+
+      <pre><code>import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Save data
+const saveData = async (key, value) =&gt; {
+  try {
+    await AsyncStorage.setItem(key, JSON.stringify(value));
+  } catch (err) {
+    console.error('Save error:', err);
+  }
+};
+
+// Read data
+const getData = async (key) =&gt; {
+  try {
+    const value = await AsyncStorage.getItem(key);
+    return value ? JSON.parse(value) : null;
+  } catch (err) {
+    console.error('Read error:', err);
+  }
+};
+
+// Remove data
+const removeData = async (key) =&gt; {
+  try {
+    await AsyncStorage.removeItem(key);
+  } catch (err) {
+    console.error('Remove error:', err);
+  }
+};</code></pre>
+
+      <h3>Use Case: Caching API Data</h3>
+      <pre><code>useEffect(() =&gt; {
+  const fetchPosts = async () =&gt; {
+    // Try to get cached data first
+    const cached = await getData('cached_posts');
+    if (cached) {
+      setPosts(cached);
+      setLoading(false);
+    }
+
+    // Then fetch fresh data
+    try {
+      const res = await fetch(`${API_URL}/posts`);
+      const data = await res.json();
+      const postsData = data.data || data;
+      setPosts(postsData);
+      await saveData('cached_posts', postsData);
+    } catch (err) {
+      console.error('Fetch error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchPosts();
+}, []);</code></pre>
+
+      <div class="tip">
+        <strong>Why cache?</strong>
+        Para kahit walang internet, may data pa ring maipakita ang app. Ito ang <strong>offline-first</strong> approach — common sa mobile apps.
+      </div>
+
+      <h2>Part 5: Pull-to-Refresh</h2>
+      <p>Gamit ang <code>RefreshControl</code> para mag-refresh ng data kapag nag-swipe pababa:</p>
+
+      <pre><code>import { RefreshControl } from 'react-native';
+
+const [refreshing, setRefreshing] = useState(false);
+
+const onRefresh = async () =&gt; {
+  setRefreshing(true);
+  try {
+    const res = await fetch(`${API_URL}/posts`);
+    const data = await res.json();
+    setPosts(data.data || data);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setRefreshing(false);
+  }
+};
+
+// Sa FlatList:
+&lt;FlatList
+  data={posts}
+  keyExtractor={item =&gt; item.id.toString()}
+  renderItem={renderItem}
+  refreshControl={
+    &lt;RefreshControl refreshing={refreshing} onRefresh={onRefresh} /&gt;
+  }
+/&gt;</code></pre>
+
+      <!-- ======== QUIZ ======== -->
+      <h2>Quick Quiz</h2>
+
+      <div class="quiz-item">
+        <div class="quiz-question">1. Anong component ang ginagamit para mag-display ng scrollable list sa React Native?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q1" value="a"> <code>&lt;List&gt;</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="b"> <code>&lt;ScrollList&gt;</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="c"> <code>&lt;FlatList&gt;</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback1"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">2. Ano ang gamit ng AsyncStorage sa React Native?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q2" value="a"> Mag-upload ng files sa server</label>
+          <label class="quiz-option"><input type="radio" name="q2" value="b"> Mag-save ng data sa phone ng user</label>
+          <label class="quiz-option"><input type="radio" name="q2" value="c"> Mag-sync ng data sa cloud</label>
+        </div>
+        <div class="quiz-feedback" id="feedback2"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">3. Anong prop ng FlatList ang ginagamit para sa pull-to-refresh?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q3" value="a"> <code>onRefresh</code></label>
+          <label class="quiz-option"><input type="radio" name="q3" value="b"> <code>refreshControl</code></label>
+          <label class="quiz-option"><input type="radio" name="q3" value="c"> <code>onPull</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback3"></div>
+      </div>
+
+      <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+      <!-- ======== PROJECT ======== -->
+      <div class="project">
+        <h3>Mini-Project: Blog Reader App</h3>
+        <p>Ikonek ang iyong React Native app sa iyong Laravel Blog API:</p>
+        <ul>
+          <li>Gumawa ng Blog List screen na gumagamit ng FlatList</li>
+          <li>I-fetch ang posts mula sa <code>/api/posts</code> endpoint</li>
+          <li>Magdagdag ng loading indicator (ActivityIndicator)</li>
+          <li>Magdagdag ng pull-to-refresh</li>
+          <li>I-cache ang posts gamit ang AsyncStorage</li>
+          <li>Gumawa ng Blog Detail screen na nagpapakita ng buong post</li>
+        </ul>
+      </div>
+
+      <!-- ======== SUMMARY ======== -->
+      <h2>Summary</h2>
+      <ul>
+        <li>Gamitin ang <code>fetch</code> para kumonek sa Laravel API — pareho lang sa web</li>
+        <li>Ang <code>FlatList</code> ang main list component — optimized, may pull-to-refresh at pagination</li>
+        <li>Ang <code>AsyncStorage</code> ay para sa local data persistence (parang localStorage)</li>
+        <li>I-cache ang API responses para sa offline access at mas mabilis na load</li>
+        <li>Gamitin ang <code>ActivityIndicator</code> para sa loading states</li>
+      </ul>
+
+      <div class="info">
+        <strong>Next Steps</strong>
+        Sa susunod na lesson (0018), matututunan mo ang <strong>Deployment & Portfolio</strong> — kung paano i-deploy ang iyong Laravel API sa shared hosting at bumuo ng portfolio na magpapakita ng lahat ng iyong projects!
+      </div>
+
+      <div class="lesson-nav"></div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../assets/lessons-data.js"></script>
+<script src="../assets/lesson-nav.js"></script>
+<script src="../assets/sidebar.js"></script>
+<script>
+  function checkQuiz() {
+    var answers = { q1: 'c', q2: 'b', q3: 'b' };
+    for (var key in answers) {
+      var sel = document.querySelector('input[name="' + key + '"]:checked');
+      var fb = document.getElementById('feedback' + key.slice(1));
+      if (!sel) { fb.textContent = 'Please select an answer!'; fb.className = 'quiz-feedback incorrect'; continue; }
+      if (sel.value === answers[key]) {
+        fb.textContent = '\u2705 Tama! ' + (key === 'q1' ? 'Ang FlatList ang standard list component sa RN.' : key === 'q2' ? 'Ang AsyncStorage ay local storage sa phone ng user.' : 'Ang refreshControl prop ang ginagamit para sa pull-to-refresh.');
+        fb.className = 'quiz-feedback correct';
+      } else {
+        fb.textContent = '\u274C Hindi tama. ' + (key === 'q1' ? 'Hint: Ito ay optimized para sa malalaking lists.' : key === 'q2' ? 'Hint: Katulad ito ng localStorage sa web.' : 'Hint: Ito ay isang prop na tumatanggap ng RefreshControl component.');
+        fb.className = 'quiz-feedback incorrect';
+      }
+    }
+  }
+</script>
+</body>
+</html>

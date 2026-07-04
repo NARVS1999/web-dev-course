@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0007: Laravel Migrations, Eloquent ORM & CRUD</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body><div class="lesson-layout"><aside class="lesson-sidebar" id="lesson-sidebar"></aside><main class="lesson-main">
+  <div class="lesson-container">
+    <h1>Lesson 0007: Laravel Migrations, Eloquent ORM & CRUD</h1>
+    <p><em>Ikonekta ang Laravel sa MySQL — gumawa, bumasa, mag-update, at magbura ng data!</em></p>
+
+    <div class="info">
+      <strong>Lesson Goal</strong>
+      Matututunan mo kung paano ikonekta ang Laravel sa MySQL database, gumamit ng <strong>migrations</strong> para gumawa ng tables, <strong>Eloquent ORM</strong> para mag-interact sa database, at gumawa ng <strong>CRUD API</strong> (Create, Read, Update, Delete). Sa dulo, gagawa ka ng Blog API!
+    </div>
+
+    <h2>Ano ang Eloquent ORM?</h2>
+    <p>
+      Ang <strong>ORM</strong> (Object-Relational Mapping) ay isang technique na nagpapahintulot sa'yo na magtrabaho sa database gamit ang PHP objects at methods — <strong>hindi na kailangan magsulat ng SQL!</strong>
+    </p>
+
+    <pre><code>// Without ORM — SQL
+$users = DB::select('SELECT * FROM users WHERE age > ?', [18]);
+
+// With Eloquent ORM — PHP objects!
+$users = User::where('age', '>', 18)->get();</code></pre>
+
+    <blockquote>
+      <strong>Analogy:</strong> Ang Eloquent ay parang <strong>translator</strong> — ikaw magsalita ng PHP, isasalin nito sa SQL para sa database. Hindi mo na kailangang mag-SQL nang manual!
+    </blockquote>
+
+    <h2>Step 1: I-connect ang Laravel sa MySQL</h2>
+
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <p>I-ensure na <strong>running ang MySQL</strong> sa XAMPP Control Panel.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <p>Gumawa ng database sa phpMyAdmin: <code>blog_api</code></p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">3</div>
+      <div class="step-content">
+        <p>I-edit ang <code>.env</code> file sa root ng Laravel project mo:</p>
+        <pre><code>DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=blog_api
+DB_USERNAME=root
+DB_PASSWORD=</code></pre>
+        <p><em>Default, walang password ang MySQL sa XAMPP. Kung nag-set ka, ilagay mo.</em></p>
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>.env File</strong>
+      Ang <code>.env</code> file ang naglalaman ng configuration mo. <strong>Huwag itong i-commit sa GitHub!</strong> Kaya nga nasa <code>.gitignore</code> ito. Bawat developer/environment ay may sariling .env.
+    </div>
+
+    <h2>Step 2: Migrations — Version Control para sa Database</h2>
+    <p>
+      Ang <strong>migrations</strong> ay parang Git para sa database schema. Sa halip na mag-execute ng SQL sa phpMyAdmin, magsusulat ka ng PHP code na naglalarawan ng tables mo. Pwedeng i-rollback, i-version, at i-share sa team!
+    </p>
+
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <p>Gumawa ng migration para sa <code>posts</code> table:</p>
+        <pre><code>php artisan make:migration create_posts_table</code></pre>
+        <p>Gagawa ito ng file sa <code>database/migrations/xxxx_create_posts_table.php</code></p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <p>I-edit ang migration file:</p>
+        <pre><code>&lt;?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('posts', function (Blueprint $table) {
+            $table->id();
+            $table->string('title', 200);
+            $table->text('body');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('posts');
+    }
+};</code></pre>
+      </div>
+    </div>
+
+    <div class="info">
+      <strong>Migration Methods Explained</strong>
+      <ul>
+        <li><code>up()</code> — kung ano ang gagawin (gumawa ng table)</li>
+        <li><code>down()</code> — kung paano i-undo (burahin ang table)</li>
+        <li><code>$table->id()</code> — auto-increment primary key (named 'id')</li>
+        <li><code>$table->foreignId('user_id')->constrained()</code> — foreign key na naka-link sa users table</li>
+        <li><code>$table->timestamps()</code> — gumagawa ng <code>created_at</code> at <code>updated_at</code> columns</li>
+        <li><code>onDelete('cascade')</code> — kapag na-delete ang user, mabubura rin ang posts niya</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <div class="step-number">3</div>
+      <div class="step-content">
+        <p>I-run ang migration:</p>
+        <pre><code>php artisan migrate</code></pre>
+        <p>Check sa phpMyAdmin — may <code>posts</code> table na! 🎉</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">4</div>
+      <div class="step-content">
+        <p>Kung magkamali, pwedeng i-rollback:</p>
+        <pre><code>php artisan migrate:rollback   <!-- undo last batch -->
+php artisan migrate:fresh      <!-- drop all tables and re-run --></code></pre>
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>Naka-define na ang users table!</strong>
+      Kapag gumawa ka ng bagong Laravel project, may kasama na itong <code>create_users_table.php</code> migration. Kasama na ang <code>name</code>, <code>email</code>, at <code>password</code> columns.
+    </div>
+
+    <h2>Step 3: Eloquent Models</h2>
+    <p>Ang <strong>Model</strong> ay ang PHP class na kumakatawan sa isang database table.</p>
+
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <p>Gumawa ng Post model (kasama na ang User model sa simula):</p>
+        <pre><code>php artisan make:model Post</code></pre>
+        <p>Gagawa ng file sa <code>app/Models/Post.php</code></p>
+      </div>
+    </div>
+
+    <pre><code>&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Post extends Model
+{
+    // Specify kung aling columns ang pwedeng i-mass assign
+    protected $fillable = [
+        'title',
+        'body',
+        'user_id',
+    ];
+
+    // Define relationship: isang Post ay belongs sa isang User
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}</code></pre>
+
+    <p>I-edit din ang <code>app/Models/User.php</code> para i-define ang relationship:</p>
+    <pre><code>&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+class User extends Authenticatable
+{
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    // Define relationship: isang User ay may maraming Posts
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+}</code></pre>
+
+    <h2>Step 4: Eloquent CRUD — Ang mga Basic Operations</h2>
+
+    <h3>CREATE — Gumawa ng Record</h3>
+    <pre><code>// Paraan 1: Create with array
+$post = Post::create([
+    'title' => 'My First Post',
+    'body' => 'Hello, this is my first post using Eloquent!',
+    'user_id' => 1,
+]);
+
+// Paraan 2: Create with instance
+$post = new Post();
+$post->title = 'Another Post';
+$post->body = 'Body content here';
+$post->user_id = 1;
+$post->save();
+
+dd($post); // check ang result</code></pre>
+
+    <h3>READ — Kumuha ng Records</h3>
+    <pre><code>// Lahat ng posts
+$posts = Post::all();
+
+// Hanapin by ID
+$post = Post::find(1);
+
+// May conditions
+$posts = Post::where('user_id', 1)->get();
+$post = Post::where('title', 'My First Post')->first();
+
+// With relationships (para maiwasan ang N+1 problem)
+$posts = Post::with('user')->get();
+
+// Pagination
+$posts = Post::paginate(10);</code></pre>
+
+    <h3>UPDATE — Baguhin ang Record</h3>
+    <pre><code>// Paraan 1: Find then update
+$post = Post::find(1);
+$post->title = 'Updated Title';
+$post->save();
+
+// Paraan 2: Direct update
+Post::where('id', 1)->update([
+    'title' => 'Updated Title Directly',
+]);</code></pre>
+
+    <h3>DELETE — Burahin ang Record</h3>
+    <pre><code>// Paraan 1: Find then delete
+$post = Post::find(1);
+$post->delete();
+
+// Paraan 2: Direct delete
+Post::destroy(1);
+
+// May condition
+Post::where('user_id', 1)->delete();</code></pre>
+
+    <h2>🛠️ Mini-Project: Blog CRUD API</h2>
+
+    <div class="project">
+      <h3>Gawin Mo Ito!</h3>
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p>Gumawa ng <code>PostController</code>:</p>
+          <pre><code>php artisan make:controller PostController --resource</code></pre>
+          <p>Ang <code>--resource</code> flag ay gumagawa ng methods para sa CRUD: <code>index</code>, <code>store</code>, <code>show</code>, <code>update</code>, <code>destroy</code>.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p>I-edit ang <code>app/Http/Controllers/PostController.php</code>:</p>
+        </div>
+      </div>
+
+      <pre><code>&lt;?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Post;
+use Illuminate\Http\Request;
+
+class PostController extends Controller
+{
+    // GET /api/posts — list all posts
+    public function index()
+    {
+        $posts = Post::with('user')->get();
+        return response()->json([
+            'success' => true,
+            'data' => $posts
+        ]);
+    }
+
+    // POST /api/posts — create a post
+    public function store(Request $request)
+    {
+        $post = Post::create([
+            'title' => $request->title,
+            'body' => $request->body,
+            'user_id' => $request->user_id,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $post
+        ], 201);
+    }
+
+    // GET /api/posts/{id} — show single post
+    public function show($id)
+    {
+        $post = Post::with('user')->find($id);
+
+        if (!$post) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Post not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $post
+        ]);
+    }
+
+    // PUT/PATCH /api/posts/{id} — update a post
+    public function update(Request $request, $id)
+    {
+        $post = Post::find($id);
+
+        if (!$post) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Post not found'
+            ], 404);
+        }
+
+        $post->update([
+            'title' => $request->title ?? $post->title,
+            'body' => $request->body ?? $post->body,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $post
+        ]);
+    }
+
+    // DELETE /api/posts/{id} — delete a post
+    public function destroy($id)
+    {
+        $post = Post::find($id);
+
+        if (!$post) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Post not found'
+            ], 404);
+        }
+
+        $post->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Post deleted successfully'
+        ]);
+    }
+}</code></pre>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p>I-edit ang <code>routes/api.php</code>:</p>
+          <pre><code>&lt;?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PostController;
+
+// Resource route — automatic na gagawa ng lahat ng CRUD routes!
+Route::apiResource('posts', PostController::class);
+
+// Ito ang mabubuo:
+// GET    /api/posts       → index()
+// POST   /api/posts       → store()
+// GET    /api/posts/{id}  → show()
+// PUT    /api/posts/{id}  → update()
+// DELETE /api/posts/{id}  → destroy()</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <p>I-test gamit ang Postman o Thunder Client:</p>
+          <pre><code>// CREATE
+POST http://localhost:8000/api/posts
+Body: { "title": "My Blog Post", "body": "Content here", "user_id": 1 }
+
+// READ ALL
+GET http://localhost:8000/api/posts
+
+// READ ONE
+GET http://localhost:8000/api/posts/1
+
+// UPDATE
+PUT http://localhost:8000/api/posts/1
+Body: { "title": "Updated Title" }
+
+// DELETE
+DELETE http://localhost:8000/api/posts/1</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <h2>🛠️ Pagawa: Gumawa ng User seeder para may test data</h2>
+    <pre><code>// Gumawa ng seeder
+php artisan make:seeder UserPostSeeder
+
+// I-edit ang database/seeders/UserPostSeeder.php
+&lt;?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Post;
+
+class UserPostSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // Gumawa ng user
+        $user = User::create([
+            'name' => 'Juan Dela Cruz',
+            'email' => 'juan@example.com',
+            'password' => bcrypt('password123'),
+        ]);
+
+        // Gumawa ng posts para sa user na ito
+        Post::create([
+            'title' => 'Getting Started with Laravel',
+            'body' => 'Laravel is an amazing PHP framework...',
+            'user_id' => $user->id,
+        ]);
+
+        Post::create([
+            'title' => 'Why Eloquent ORM is Awesome',
+            'body' => 'Eloquent makes database interactions so easy...',
+            'user_id' => $user->id,
+        ]);
+    }
+}
+
+// I-run ang seeder
+php artisan db:seed --class=UserPostSeeder
+
+// Or i-add sa DatabaseSeeder.php at i-run lang:
+php artisan db:seed</code></pre>
+
+    <h2>Eloquent Relationships Recap</h2>
+    <table>
+      <tr><th>Relationship</th><th>Example</th><th>Database</th></tr>
+      <tr><td><strong>One to Many</strong></td><td>User → Posts</td><td><code>posts.user_id</code> → <code>users.id</code></td></tr>
+      <tr><td><strong>Belongs To</strong></td><td>Post → User</td><td>Baliktad ng One to Many</td></tr>
+      <tr><td><strong>Many to Many</strong></td><td>Posts ↔ Tags</td><td>May pivot table <code>post_tag</code></td></tr>
+    </table>
+
+    <h2>✅ Quiz</h2>
+
+    <div class="quiz-item">
+      <p class="quiz-question">1. Ano ang tawag sa PHP class na kumakatawan sa isang database table?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q1" value="a"> Controller</label>
+        <label class="quiz-option"><input type="radio" name="q1" value="b"> Migration</label>
+        <label class="quiz-option"><input type="radio" name="q1" value="c"> Model</label>
+        <label class="quiz-option"><input type="radio" name="q1" value="d"> Seeder</label>
+      </div>
+      <div class="quiz-feedback" id="feedback1"></div>
+    </div>
+
+    <div class="quiz-item">
+      <p class="quiz-question">2. Aling Eloquent method ang ginagamit para kumuha ng records na may condition?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q2" value="a"> <code>Post::find(1)</code></label>
+        <label class="quiz-option"><input type="radio" name="q2" value="b"> <code>Post::where('user_id', 1)->get()</code></label>
+        <label class="quiz-option"><input type="radio" name="q2" value="c"> <code>Post::all()</code></label>
+        <label class="quiz-option"><input type="radio" name="q2" value="d"> <code>Post::select('*')</code></label>
+      </div>
+      <div class="quiz-feedback" id="feedback2"></div>
+    </div>
+
+    <div class="quiz-item">
+      <p class="quiz-question">3. Aling migration method ang ginagamit para mag-add ng foreign key sa <code>users</code> table?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q3" value="a"> <code>$table->integer('user_id')</code></label>
+        <label class="quiz-option"><input type="radio" name="q3" value="b"> <code>$table->foreignId('user_id')->constrained()</code></label>
+        <label class="quiz-option"><input type="radio" name="q3" value="c"> <code>$table->reference('user_id')->on('users')</code></label>
+        <label class="quiz-option"><input type="radio" name="q3" value="d"> <code>$table->key('user_id', 'users')</code></label>
+      </div>
+      <div class="quiz-feedback" id="feedback3"></div>
+    </div>
+
+    <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+    <h2>📖 Recommended Resources</h2>
+    <ul>
+      <li><a href="https://laravel.com/docs/eloquent" target="_blank">Laravel Docs: Eloquent ORM</a> — Official documentation</li>
+      <li><a href="https://laravel.com/docs/migrations" target="_blank">Laravel Docs: Migrations</a> — Official documentation</li>
+      <li><a href="https://laravel.com/docs/seeding" target="_blank">Laravel Docs: Seeding</a> — Official documentation</li>
+    </ul>
+
+    <h2>🎯 Lesson Summary</h2>
+    <ul>
+      <li><strong>Migrations</strong> = version control para sa database schema</li>
+      <li><strong>Models</strong> = PHP classes na kumakatawan sa tables</li>
+      <li><strong>Eloquent ORM</strong> = magtrabaho sa database gamit PHP (hindi na SQL)</li>
+      <li><strong>CRUD</strong>: <code>create()</code>, <code>all()/find()/where()</code>, <code>update()</code>, <code>delete()</code></li>
+      <li><strong>Relationships</strong>: <code>hasMany()</code>, <code>belongsTo()</code></li>
+      <li>Gumawa ka ng <strong>Blog CRUD API</strong> na may working endpoints! 🎉</li>
+    </ul>
+
+    <div class="info">
+      <strong>Next Lesson:</strong> Lesson 0008 — Laravel Relationships & Authentication. Magdadagdag tayo ng comments table at user login system!
+    </div>
+
+    <div class="lesson-nav">
+      <a href="0006-laravel-setup-routing-controllers.html" class="nav-link nav-prev">← Previous: Laravel Setup</a>
+      <a href="0008-laravel-relationships-authentication.html" class="nav-link nav-next">Next: Relationships & Auth →</a>
+    </div>
+
+  </div>
+
+  <script>
+    function checkQuiz() {
+      const answers = { q1: 'c', q2: 'b', q3: 'b' };
+      for (let [name, correct] of Object.entries(answers)) {
+        const selected = document.querySelector(`input[name="${name}"]:checked`);
+        const feedback = document.getElementById(`feedback${name.slice(1)}`);
+        if (!selected) {
+          feedback.textContent = 'Please select an answer!';
+          feedback.className = 'quiz-feedback incorrect';
+          continue;
+        }
+        if (selected.value === correct) {
+          feedback.textContent = '✅ Tama! Magaling!';
+          feedback.className = 'quiz-feedback correct';
+        } else {
+          let hints = { q1: 'Hint: Model ang kumakatawan sa database table.', q2: 'Hint: where() ang ginagamit para sa conditions.', q3: 'Hint: foreignId()->constrained() ang Laravel way para sa foreign keys.' };
+          feedback.textContent = `❌ Hindi tama. ${hints[name]}`;
+          feedback.className = 'quiz-feedback incorrect';
+        }
+      }
+    }
+  </script>
+</main></div><script src="../assets/lessons-data.js"></script><script src="../assets/lesson-nav.js"></script><script src="../assets/sidebar.js"></script></body>
+</html>

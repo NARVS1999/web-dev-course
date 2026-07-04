@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0018: Deployment & Portfolio</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="lesson-layout">
+  <aside class="lesson-sidebar" id="lesson-sidebar"></aside>
+  <main class="lesson-main">
+    <div class="lesson-container">
+
+      <h1>Lesson 0018: Deployment & Portfolio</h1>
+      <p><em>I-deploy ang iyong Laravel API sa shared hosting at buuin ang iyong portfolio para sa freelancing.</em></p>
+
+      <div class="info">
+        <strong>Lesson Goal</strong>
+        Matutunan kung paano i-deploy ang Laravel API sa shared hosting (cPanel), i-setup ang production environment, at bumuo ng portfolio na magpapakita ng lahat ng iyong projects.
+      </div>
+
+      <h2>Part 1: Deployment Options</h2>
+      <p>Para sa freelance projects, may iba't ibang paraan para i-deploy ang iyong Laravel API:</p>
+
+      <table>
+        <tr><th>Platform</th><th>Cost</th><th>Good For</th></tr>
+        <tr><td>Shared hosting (cPanel)</td><td>~$5-10/month</td><td>Small projects, beginners</td></tr>
+        <tr><td>VPS (DigitalOcean, Linode)</td><td>~$6-12/month</td><td>Medium projects, more control</td></tr>
+        <tr><td>Render / Railway</td><td>Free tier available</td><td>Simple APIs, prototypes</td></tr>
+      </table>
+
+      <div class="tip">
+        <strong>Shared hosting tip</strong>
+        Maraming shared hosting providers (Hostinger, Namecheap, SiteGround) ang may isa-click na Laravel installer sa cPanel. I-check ang "Softaculous" o "Installatron" sa cPanel dashboard.
+      </div>
+
+      <h2>Part 2: Deploy Laravel to Shared Hosting (cPanel)</h2>
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p><strong>Maghanda ng production database:</strong> Sa cPanel, gamitin ang MySQL Wizard para gumawa ng database at user. I-note ang credentials.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p><strong>I-update ang .env para sa production:</strong></p>
+          <pre><code>APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://yourdomain.com
+
+DB_HOST=localhost
+DB_DATABASE=your_database_name
+DB_USERNAME=your_database_user
+DB_PASSWORD=your_database_password</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p><strong>I-upload ang files via FTP o File Manager:</strong> I-upload ang buong Laravel project sa <code>public_html/</code> (o subfolder).</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <p><strong>Ilipat ang contents ng <code>public/</code> sa root:</strong> Sa shared hosting, ang document root ay nakaturo sa <code>public_html/</code>. Kailangan mong ilipat ang laman ng <code>public/</code> sa <code>public_html/</code> at i-update ang <code>index.php</code> paths.</p>
+          <p>Mas madaling alternatibo: gumamit ng <strong>.htaccess</strong> para i-rewrite ang requests:</p>
+          <pre><code># public_html/.htaccess
+RewriteEngine On
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^(.*)$ public/$1 [L]</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <p><strong>Run migrations:</strong> I-access ang iyong site at magdagdag ng temporary route para i-run ang migrations, o gamitin ang cPanel terminal:</p>
+          <pre><code>php artisan migrate --force</code></pre>
+        </div>
+      </div>
+
+      <div class="warning">
+        <strong>Security Reminder</strong>
+        Siguraduhing i-delete ang installation routes pagkatapos ng migrations. I-set ang <code>APP_DEBUG=false</code> para hindi mag-leak ng sensitive info.
+      </div>
+
+      <h2>Part 3: Building Your Portfolio</h2>
+      <p>Ngayong marami ka nang projects, kailangan mo ng portfolio site para ma-present ang mga ito sa clients.</p>
+
+      <h3>Ano ang Dapat Laman ng Portfolio:</h3>
+      <ul>
+        <li><strong>Home / Hero Section</strong> — Maikling intro kung sino ka at ano ang kaya mong gawin</li>
+        <li><strong>Services</strong> — Anong klase ng websites ang kaya mong gawin (portfolio, e-commerce, blog, atbp.)</li>
+        <li><strong>Projects</strong> — Listahan ng iyong mga nagawang projects na may screenshots at description</li>
+        <li><strong>Skills</strong> — HTML, CSS, JS, Laravel, Next.js, React Native, MySQL</li>
+        <li><strong>Contact</strong> — Form o direct contact info para maabot ka ng clients</li>
+      </ul>
+
+      <h3>Gamitin ang Iyong Next.js Portfolio</h3>
+      <p>I-deploy ang iyong Next.js portfolio sa Vercel (gaya ng natutunan sa Lesson 0014) at i-customize ito para sa freelancing:</p>
+
+      <pre><code>// pages/projects.js — Projects page
+import Link from 'next/link';
+
+const projects = [
+  {
+    title: 'Blog API',
+    desc: 'Laravel REST API with authentication and CRUD operations.',
+    tech: ['Laravel', 'MySQL', 'Sanctum'],
+  },
+  {
+    title: 'Portfolio App',
+    desc: 'Multi-page Next.js portfolio with SSR and optimized images.',
+    tech: ['Next.js', 'Vercel'],
+  },
+  {
+    title: 'Mobile Blog Reader',
+    desc: 'React Native app connected to Laravel API with offline caching.',
+    tech: ['React Native', 'Expo', 'AsyncStorage'],
+  },
+];
+
+export default function Projects() {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;My Projects&lt;/h1&gt;
+      {projects.map((p, i) =&gt; (
+        &lt;div key={i} style={{ marginBottom: 24 }}&gt;
+          &lt;h2&gt;{p.title}&lt;/h2&gt;
+          &lt;p&gt;{p.desc}&lt;/p&gt;
+          &lt;p&gt;&lt;strong&gt;Tech:&lt;/strong&gt; {p.tech.join(', ')}&lt;/p&gt;
+        &lt;/div&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+      <!-- ======== QUIZ ======== -->
+      <h2>Quick Quiz</h2>
+
+      <div class="quiz-item">
+        <div class="quiz-question">1. Ano ang pinaka-importante sa .env file bago mag-deploy ng Laravel?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q1" value="a"> I-set ang <code>APP_ENV=production</code> at <code>APP_DEBUG=false</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="b"> I-keep ang <code>APP_DEBUG=true</code> para sa debugging</label>
+          <label class="quiz-option"><input type="radio" name="q1" value="c"> Delete ang .env file</label>
+        </div>
+        <div class="quiz-feedback" id="feedback1"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">2. Saan ka nagse-setup ng database sa shared hosting?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q2" value="a"> Sa Laravel .env file lang</label>
+          <label class="quiz-option"><input type="radio" name="q2" value="b"> Sa cPanel (MySQL Wizard o phpMyAdmin)</label>
+          <label class="quiz-option"><input type="radio" name="q2" value="c"> Sa command line ng computer mo</label>
+        </div>
+        <div class="quiz-feedback" id="feedback2"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">3. Alin ang HINDI dapat laman ng isang freelance portfolio?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q3" value="a"> Listahan ng iyong projects</label>
+          <label class="quiz-option"><input type="radio" name="q3" value="b"> Personal na diary entries</label>
+          <label class="quiz-option"><input type="radio" name="q3" value="c"> Contact information</label>
+        </div>
+        <div class="quiz-feedback" id="feedback3"></div>
+      </div>
+
+      <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+      <!-- ======== PROJECT ======== -->
+      <div class="project">
+        <h3>Mini-Project: Deploy & Portfolio</h3>
+        <p>Gawin ang sumusunod:</p>
+        <ul>
+          <li>I-deploy ang iyong Laravel Blog API sa shared hosting (o Render free tier)</li>
+          <li>I-update ang inyong Next.js portfolio para mag-include ng projects page</li>
+          <li>I-deploy ang portfolio sa Vercel</li>
+          <li>I-connect ang portfolio sa deployed API (i-update ang NEXT_PUBLIC_API_URL)</li>
+          <li>I-share ang link sa portfolio — handa ka nang mag-freelance!</li>
+        </ul>
+      </div>
+
+      <!-- ======== SUMMARY ======== -->
+      <h2>Summary</h2>
+      <ul>
+        <li>Ang shared hosting (cPanel) ay murang opsyon para i-deploy ang Laravel API</li>
+        <li>I-set ang <code>APP_ENV=production</code> at <code>APP_DEBUG=false</code> bago mag-deploy</li>
+        <li>Gamitin ang cPanel MySQL Wizard para gumawa ng database</li>
+        <li>Ang portfolio ay dapat magpakita ng skills, projects, at contact info</li>
+        <li>I-deploy ang portfolio sa Vercel at i-connect sa iyong API</li>
+      </ul>
+
+      <div class="info">
+        <strong>Next Steps</strong>
+        Sa susunod na lesson (0019), gagawa tayo ng <strong>Final Project</strong> — isang full-stack freelance project na pagsasamahin ang lahat ng iyong natutunan!
+      </div>
+
+      <div class="lesson-nav"></div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../assets/lessons-data.js"></script>
+<script src="../assets/lesson-nav.js"></script>
+<script src="../assets/sidebar.js"></script>
+<script>
+  function checkQuiz() {
+    var answers = { q1: 'a', q2: 'b', q3: 'b' };
+    for (var key in answers) {
+      var sel = document.querySelector('input[name="' + key + '"]:checked');
+      var fb = document.getElementById('feedback' + key.slice(1));
+      if (!sel) { fb.textContent = 'Please select an answer!'; fb.className = 'quiz-feedback incorrect'; continue; }
+      if (sel.value === answers[key]) {
+        fb.textContent = '\u2705 Tama! ' + (key === 'q1' ? 'Dapat naka-production at naka-off ang debug para safe.' : key === 'q2' ? 'Ang cPanel ang may MySQL management tools.' : 'Ang portfolio ay para sa professional presentation, hindi personal diary.');
+        fb.className = 'quiz-feedback correct';
+      } else {
+        fb.textContent = '\u274C Hindi tama. ' + (key === 'q1' ? 'Hint: Dapat i-off ang debug information sa production.' : key === 'q2' ? 'Hint: Ito ang hosting control panel.' : 'Hint: Professional portfolio dapat ang focus.');
+        fb.className = 'quiz-feedback incorrect';
+      }
+    }
+  }
+</script>
+</body>
+</html>

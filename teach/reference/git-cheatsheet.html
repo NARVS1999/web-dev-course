@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git Cheatsheet</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    @media print { body { font-size: 9pt; } }
+  </style>
+</head>
+<body>
+  <div class="lesson-container">
+    <h1>Git Cheatsheet</h1>
+
+    <h2>Config</h2>
+    <pre><code>git config --global user.name "Name"
+git config --global user.email "email@example.com"</code></pre>
+
+    <h2>Main Workflow (Add → Commit → Push)</h2>
+    <pre><code>git init                  # start tracking a folder
+git status                # check what changed
+git add .                 # stage all changes
+git add file.html         # stage specific file
+git commit -m "message"   # save point
+git push origin main      # upload to GitHub
+git pull origin main      # download from GitHub</code></pre>
+
+    <h2>Branches</h2>
+    <pre><code>git branch name           # create branch
+git checkout name         # switch to branch
+git checkout -b name      # create + switch
+git merge name            # merge into current
+git branch -d name        # delete branch</code></pre>
+
+    <h2>Undo</h2>
+    <pre><code>git checkout -- file       # undo file changes
+git reset HEAD file        # unstage file
+git reset --soft HEAD~1    # undo commit (keep changes)
+git reset --hard HEAD~1    # undo commit (delete changes)
+git revert HEAD            # safe undo via new commit</code></pre>
+
+    <h2>Log / History</h2>
+    <pre><code>git log                   # commit history
+git log --oneline         # compact history
+git diff                  # see unstaged changes</code></pre>
+
+    <h2>Remote</h2>
+    <pre><code>git remote add origin URL  # connect to GitHub
+git remote -v              # see remotes
+git push -u origin main    # first push with tracking</code></pre>
+
+    <h2>.gitignore</h2>
+    <pre><code>node_modules/
+.env
+.DS_Store
+Thumbs.db
+*.log</code></pre>
+
+    <h2>Good Commit Messages</h2>
+    <pre><code>git commit -m "Add login form with validation"
+git commit -m "Fix navbar not showing on mobile"
+git commit -m "Refactor API calls into service file"</code></pre>
+  </div>
+</body>
+</html>

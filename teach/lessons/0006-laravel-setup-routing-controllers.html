@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0006: Laravel Setup, Routing & Controllers</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body><div class="lesson-layout"><aside class="lesson-sidebar" id="lesson-sidebar"></aside><main class="lesson-main">
+  <div class="lesson-container">
+    <h1>Lesson 0006: Laravel Setup, Routing & Controllers</h1>
+    <p><em>Gawa tayo ng backend API gamit ang Laravel — ang puso ng iyong web app!</em></p>
+
+    <div class="info">
+      <strong>Lesson Goal</strong>
+      I-setup ang Laravel sa local machine, intindihin ang routing system, controllers, at Blade templates. Sa dulo, gagawa ka ng "Hello World" API at isang simple web page gamit ang local server!
+    </div>
+
+    <h2>Ano ang Laravel?</h2>
+    <p>
+      Ang <strong>Laravel</strong> ay ang pinakasikat na PHP framework para sa web development. Ginagamit ito ng malalaking companies at freelancers dahil:
+    </p>
+    <ul>
+      <li><strong>Mabilis</strong> mag-setup at mag-develop</li>
+      <li><strong>Secure</strong> — built-in na ang protection sa common attacks</li>
+      <li><strong>ORM</strong> (Eloquent) — napakadaling magtrabaho sa database</li>
+      <li><strong>Massive ecosystem</strong> — maraming tools at libraries</li>
+      <li><strong>Perfect for freelancing</strong> — maraming clients ang gumagamit ng Laravel</li>
+    </ul>
+
+    <blockquote>
+      <strong>Analogy:</strong> Kung ang PHP ay parang <strong>martilyo at pako</strong> (pwede mong gamitin pero ikaw gagawa ng lahat), ang Laravel naman ay parang <strong>power tools</strong> — may built-in na lahat ng kailangan mo para makagawa ng professional web app nang mabilis.
+    </blockquote>
+
+    <h2>Step 1: Install Composer</h2>
+    <p>Ang <strong>Composer</strong> ay ang package manager ng PHP — parang npm para sa JavaScript.</p>
+
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <p>Pumunta sa <a href="https://getcomposer.org/download/" target="_blank">getcomposer.org</a> at i-download ang Composer for Windows.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <p>I-install ito. Hanapin nito ang PHP path mula sa XAMPP mo (<code>C:\xampp\php\php.exe</code>).</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">3</div>
+      <div class="step-content">
+        <p>I-verify sa command prompt:</p>
+        <pre><code>composer --version</code></pre>
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>XAMPP + Composer</strong>
+      Kung hindi ma-detect ng Composer installer ang PHP, i-manual set ang path: i-add ang <code>C:\xampp\php</code> sa System Environment Variables > Path.
+    </div>
+
+    <h2>Step 2: Create Laravel Project</h2>
+
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <p>I-open ang <strong>Command Prompt</strong> (or Git Bash) at pumunta sa folder kung saan mo gusto ilagay ang project:</p>
+        <pre><code>cd C:\Users\Admin\Desktop\project</code></pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <p>Gumawa ng bagong Laravel project:</p>
+        <pre><code>composer create-project laravel/laravel backend-api
+
+cd backend-api</code></pre>
+        <p><em>Matagal ito — nagda-download ng dependencies. Mga 2-5 minutes.</em></p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">3</div>
+      <div class="step-content">
+        <p>I-start ang development server:</p>
+        <pre><code>php artisan serve</code></pre>
+        <p>Pupunta ito sa <code>http://localhost:8000</code> — makikita mo ang Laravel welcome page! 🎉</p>
+      </div>
+    </div>
+
+    <div class="info">
+      <strong>Artisan</strong>
+      Ang <code>php artisan</code> ay ang command-line tool ng Laravel. Marami kang magagawa dito: gumawa ng controllers, migrations, models, at marami pang iba. Kabisaduhin mo ito!
+    </div>
+
+    <h2>Laravel Directory Structure (Mga Kailangan Mong Malaman)</h2>
+    <pre><code>backend-api/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/    ← Dito ang controllers mo
+│   │   └── Middleware/      ← Request filters
+│   └── Models/             ← Eloquent models (database tables)
+├── bootstrap/              ← App bootstrapping (wag galawin)
+├── config/                 ← Configuration files
+├── database/
+│   └── migrations/         ← Database migrations
+├── public/                 ← Document root (index.php)
+├── resources/
+│   └── views/              ← Blade templates (HTML)
+├── routes/
+│   ├── web.php             ← Web routes (with sessions)
+│   └── api.php             ← API routes (stateless)
+├── storage/                ← Logs, cache, uploaded files
+├── .env                    ← Environment variables (DB credentials!)
+├── artisan                 ← Artisan CLI
+└── composer.json           ← Dependencies</code></pre>
+
+    <h2>Routing — Ang Entry Point</h2>
+    <p>Ang <strong>routes</strong> ang nagdi-determine kung anong code ang tatakbo kapag may nag-access ng specific URL.</p>
+
+    <h3>routes/web.php — Para sa Web Pages</h3>
+    <pre><code>&lt;?php
+
+use Illuminate\Support\Facades\Route;
+
+// Basic route
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// Route na may parameter
+Route::get('/hello/{name}', function ($name) {
+    return "Hello, " . $name . "!";
+});
+
+// Route na may optional parameter
+Route::get('/user/{id?}', function ($id = null) {
+    if ($id) {
+        return "User ID: " . $id;
+    }
+    return "No user specified.";
+});</code></pre>
+
+    <h3>routes/api.php — Para sa REST API</h3>
+    <pre><code>&lt;?php
+
+use Illuminate\Support\Facades\Route;
+
+// API routes — auto-prefixed with /api
+Route::get('/hello', function () {
+    return response()->json([
+        'message' => 'Hello, World!',
+        'status' => 'success'
+    ]);
+});
+
+Route::get('/greet/{name}', function ($name) {
+    return response()->json([
+        'message' => "Hello, {$name}!",
+        'time' => now()->toDateTimeString()
+    ]);
+});</code></pre>
+
+    <div class="tip">
+      <strong>Web vs API Routes</strong>
+      Ang <code>web.php</code> ay para sa mga pages na may session at CSRF protection (like Blade views). Ang <code>api.php</code> ay para sa REST APIs na stateless — ito ang gagamitin natin for our freelance projects para pwedeng kumonekta ang Next.js at React Native!
+    </div>
+
+    <h2>HTTP Methods</h2>
+    <table>
+      <tr><th>Method</th><th>Gamit</th><th>Example</th></tr>
+      <tr><td><code>GET</code></td><td>Kumuha ng data</td><td><code>Route::get('/users', ...)</code></td></tr>
+      <tr><td><code>POST</code></td><td>Gumawa ng data</td><td><code>Route::post('/users', ...)</code></td></tr>
+      <tr><td><code>PUT</code></td><td>I-update ang data</td><td><code>Route::put('/users/{id}', ...)</code></td></tr>
+      <tr><td><code>DELETE</code></td><td>Burahin ang data</td><td><code>Route::delete('/users/{id}', ...)</code></td></tr>
+    </table>
+
+    <h2>Controllers — Pag-Organize ng Code</h2>
+    <p>Sa halip na ilagay lahat ng logic sa routes, gumamit ng <strong>controllers</strong> para i-organize ang code.</p>
+
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <p>Gumawa ng controller gamit ang Artisan:</p>
+        <pre><code>php artisan make:controller UserController</code></pre>
+        <p>Gagawa ito ng file sa <code>app/Http/Controllers/UserController.php</code></p>
+      </div>
+    </div>
+
+    <pre><code>&lt;?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class UserController extends Controller
+{
+    public function index()
+    {
+        return response()->json([
+            'users' => [
+                ['id' => 1, 'name' => 'Juan'],
+                ['id' => 2, 'name' => 'Maria'],
+                ['id' => 3, 'name' => 'Pedro'],
+            ]
+        ]);
+    }
+
+    public function show($id)
+    {
+        return response()->json([
+            'id' => $id,
+            'name' => 'User ' . $id,
+        ]);
+    }
+}</code></pre>
+
+    <h3>Kumonekta ang Route sa Controller</h3>
+    <pre><code>// routes/api.php
+use App\Http\Controllers\UserController;
+
+Route::get('/users', [UserController::class, 'index']);
+Route::get('/users/{id}', [UserController::class, 'show']);</code></pre>
+
+    <h2>Blade Templates — Mag-render ng HTML</h2>
+    <p>Ang <strong>Blade</strong> ay ang templating engine ng Laravel. Ginagamit ito para mag-render ng HTML na may dynamic data.</p>
+
+    <pre><code>&lt;!-- resources/views/hello.blade.php --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Blade Hello&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Hello, {{ $name }}!&lt;/h1&gt;
+    &lt;p&gt;Current time: {{ date('Y-m-d H:i:s') }}&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+    <pre><code>&lt;?php
+// routes/web.php
+Route::get('/blade-hello/{name}', function ($name) {
+    return view('hello', ['name' => $name]);
+});</code></pre>
+
+    <h2>🛠️ Mini-Project: Gawa Tayo ng "Hello World" API</h2>
+
+    <div class="project">
+      <h3>Gawin Mo Ito!</h3>
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p>Gumawa ng bagong controller:</p>
+          <pre><code>php artisan make:controller GreetingController</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p>I-edit ang <code>app/Http/Controllers/GreetingController.php</code>:</p>
+          <pre><code>&lt;?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class GreetingController extends Controller
+{
+    public function hello()
+    {
+        return response()->json([
+            'message' => 'Hello, World!',
+            'from' => 'Laravel API',
+            'timestamp' => now()->toDateTimeString()
+        ]);
+    }
+
+    public function greet($name)
+    {
+        return response()->json([
+            'message' => "Hello, {$name}! Welcome to Laravel.",
+            'timestamp' => now()->toDateTimeString()
+        ]);
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p>I-edit ang <code>routes/api.php</code>:</p>
+          <pre><code>&lt;?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GreetingController;
+
+Route::get('/hello', [GreetingController::class, 'hello']);
+Route::get('/greet/{name}', [GreetingController::class, 'greet']);</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <p>I-test sa browser o Postman:</p>
+          <pre><code>http://localhost:8000/api/hello
+→ {"message":"Hello, World!","from":"Laravel API","timestamp":"2026-07-04 12:00:00"}
+
+http://localhost:8000/api/greet/Juan
+→ {"message":"Hello, Juan! Welcome to Laravel.","timestamp":"2026-07-04 12:00:00"}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <h2>✅ Quiz</h2>
+
+    <div class="quiz-item">
+      <p class="quiz-question">1. Aling command ang ginagamit para gumawa ng bagong Laravel project?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q1" value="a"> <code>laravel new project</code></label>
+        <label class="quiz-option"><input type="radio" name="q1" value="b"> <code>composer create-project laravel/laravel project</code></label>
+        <label class="quiz-option"><input type="radio" name="q1" value="c"> <code>php new laravel project</code></label>
+        <label class="quiz-option"><input type="radio" name="q1" value="d"> <code>npm create laravel project</code></label>
+      </div>
+      <div class="quiz-feedback" id="feedback1"></div>
+    </div>
+
+    <div class="quiz-item">
+      <p class="quiz-question">2. Saan mo ilalagay ang API routes?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q2" value="a"> <code>routes/web.php</code></label>
+        <label class="quiz-option"><input type="radio" name="q2" value="b"> <code>routes/api.php</code></label>
+        <label class="quiz-option"><input type="radio" name="q2" value="c"> <code>app/routes.php</code></label>
+        <label class="quiz-option"><input type="radio" name="q2" value="d"> <code>config/routes.php</code></label>
+      </div>
+      <div class="quiz-feedback" id="feedback2"></div>
+    </div>
+
+    <div class="quiz-item">
+      <p class="quiz-question">3. Aling HTTP method ang ginagamit para kumuha ng data?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q3" value="a"> POST</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="b"> DELETE</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="c"> GET</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="d"> PUT</label>
+      </div>
+      <div class="quiz-feedback" id="feedback3"></div>
+    </div>
+
+    <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+    <h2>📖 Recommended Resources</h2>
+    <ul>
+      <li><a href="https://laravel.com/docs/routing" target="_blank">Laravel Docs: Routing</a> — Official documentation</li>
+      <li><a href="https://laravel.com/docs/controllers" target="_blank">Laravel Docs: Controllers</a> — Official documentation</li>
+      <li><a href="https://laracasts.com/series/laravel-8-from-scratch" target="_blank">Laracasts: Laravel From Scratch</a> — May free lessons!</li>
+    </ul>
+
+    <h2>🎯 Lesson Summary</h2>
+    <ul>
+      <li><strong>Laravel</strong> = PHP framework para sa web apps</li>
+      <li><strong>Composer</strong> = package manager ng PHP</li>
+      <li><strong>Artisan</strong> = command-line tool (<code>php artisan</code>)</li>
+      <li><strong>Routes</strong> = nasa <code>routes/web.php</code> at <code>routes/api.php</code></li>
+      <li><strong>Controllers</strong> = organize code, gawa gamit ang <code>php artisan make:controller</code></li>
+      <li><strong>Blade</strong> = templating engine ng Laravel</li>
+      <li>Gumawa ka ng <strong>Hello World API</strong> at nag-test sa browser! 🎉</li>
+    </ul>
+
+    <div class="info">
+      <strong>Next Lesson:</strong> Lesson 0007 — Laravel Migrations & Eloquent ORM. Ikokonekta natin ang Laravel sa MySQL database at gagawa ng CRUD!
+
+      <strong>May tanong?</strong> Kung hindi mo pa nai-install ang XAMPP o Composer, sabihin mo lang. Pwede kitang tulungan step-by-step.
+    </div>
+
+    <div class="lesson-nav">
+      <a href="0005-mysql-database-basics.html" class="nav-link nav-prev">← Previous: MySQL & Database Basics</a>
+      <a href="0007-laravel-migrations-eloquent-crud.html" class="nav-link nav-next">Next: Migrations & Eloquent →</a>
+    </div>
+
+  </div>
+
+  <script>
+    function checkQuiz() {
+      const answers = { q1: 'b', q2: 'b', q3: 'c' };
+      for (let [name, correct] of Object.entries(answers)) {
+        const selected = document.querySelector(`input[name="${name}"]:checked`);
+        const feedback = document.getElementById(`feedback${name.slice(1)}`);
+        if (!selected) {
+          feedback.textContent = 'Please select an answer!';
+          feedback.className = 'quiz-feedback incorrect';
+          continue;
+        }
+        if (selected.value === correct) {
+          feedback.textContent = '✅ Tama! Magaling!';
+          feedback.className = 'quiz-feedback correct';
+        } else {
+          let hints = { q1: 'Hint: Gumamit ng composer create-project.', q2: 'Hint: API routes ay nasa routes/api.php.', q3: 'Hint: GET ang ginagamit para kumuha ng data.' };
+          feedback.textContent = `❌ Hindi tama. ${hints[name]}`;
+          feedback.className = 'quiz-feedback incorrect';
+        }
+      }
+    }
+  </script>
+</main></div><script src="../assets/lessons-data.js"></script><script src="../assets/lesson-nav.js"></script><script src="../assets/sidebar.js"></script></body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Cheatsheet</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    @media print { body { font-size: 9pt; } }
+  </style>
+</head>
+<body>
+  <div class="lesson-container">
+    <h1>CSS Cheatsheet</h1>
+
+    <h2>Selectors</h2>
+    <table>
+      <tr><th>Pattern</th><th>Matches</th></tr>
+      <tr><td><code>element</code></td><td><code>p { }</code> → lahat ng <code>&lt;p&gt;</code></td></tr>
+      <tr><td><code>.class</code></td><td><code>.highlight { }</code> → <code>class="highlight"</code></td></tr>
+      <tr><td><code>#id</code></td><td><code>#header { }</code> → <code>id="header"</code></td></tr>
+      <tr><td><code>parent child</code></td><td><code>div p { }</code> → <code>&lt;p&gt;</code> inside <code>&lt;div&gt;</code></td></tr>
+      <tr><td><code>element.class</code></td><td><code>p.highlight { }</code> → <code>&lt;p class="highlight"&gt;</code></td></tr>
+      <tr><td><code>:hover</code></td><td><code>a:hover { }</code> → kapag naka-hover</td></tr>
+    </table>
+
+    <h2>Box Model</h2>
+    <pre><code>margin: 10px;         /* labas ng border */
+border: 2px solid #000; /* border mismo */
+padding: 15px;         /* loob ng border */
+/* content — nasa gitna */</code></pre>
+
+    <h2>Typography</h2>
+    <pre><code>font-family: Arial, sans-serif;
+font-size: 16px;
+font-weight: 700;     /* 400=normal, 700=bold */
+text-align: center;   /* left, center, right, justify */
+line-height: 1.6;
+color: #333;</code></pre>
+
+    <h2>Colors</h2>
+    <pre><code>color: red;                 /* named */
+color: #2563eb;             /* hex (most common) */
+color: rgb(37, 99, 235);    /* RGB */
+color: rgba(37, 99, 235, 0.5); /* with opacity */</code></pre>
+
+    <h2>Flexbox (Parent)</h2>
+    <pre><code>display: flex;
+flex-direction: row;        /* row | column */
+justify-content: center;    /* horizontal: start, center, end, space-between, space-around */
+align-items: center;        /* vertical: start, center, end, stretch */
+flex-wrap: wrap;            /* nowrap | wrap */
+gap: 1rem;                  /* spacing between items */</code></pre>
+
+    <h2>Grid (Parent)</h2>
+    <pre><code>display: grid;
+grid-template-columns: repeat(3, 1fr);  /* 3 equal columns */
+grid-template-columns: 1fr 2fr 1fr;     /* 3 columns, iba-iba width */
+gap: 1rem;</code></pre>
+
+    <h2>Responsive (Media Queries)</h2>
+    <pre><code>/* Mobile-first: default = phone styles */
+@media (min-width: 768px) { /* tablet */ }
+@media (min-width: 1024px) { /* desktop */ }
+
+/* Desktop-first: default = desktop styles */
+@media (max-width: 768px) { /* tablet */ }
+@media (max-width: 480px) { /* phone */ }</code></pre>
+
+    <h2>Positioning</h2>
+    <pre><code>position: static;     /* default */
+position: relative;   /* relative to normal position */
+position: absolute;   /* relative to nearest positioned parent */
+position: fixed;      /* relative to viewport (stays on scroll) */
+position: sticky;     /* relative until scroll reaches threshold */
+top/right/bottom/left: 10px;</code></pre>
+
+    <h2>Display</h2>
+    <table>
+      <tr><th>Value</th><th>Behavior</th></tr>
+      <tr><td><code>block</code></td><td>Full width, new line</td></tr>
+      <tr><td><code>inline</code></td><td>Shrink-wrap, same line</td></tr>
+      <tr><td><code>inline-block</code></td><td>Inline pero pwedeng magka width/height</td></tr>
+      <tr><td><code>flex</code></td><td>Flexbox layout</td></tr>
+      <tr><td><code>grid</code></td><td>Grid layout</td></tr>
+      <tr><td><code>none</code></td><td>Hidden (removed from flow)</td></tr>
+    </table>
+  </div>
+</body>
+</html>

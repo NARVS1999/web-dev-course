@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Cheatsheet</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    @media print { body { font-size: 9pt; } }
+  </style>
+</head>
+<body>
+  <div class="lesson-container">
+    <h1>JavaScript Cheatsheet</h1>
+
+    <h2>Variables</h2>
+    <pre><code>const name = "Juan";   // cannot reassign (default!)
+let age = 25;          // can reassign
+// var — avoid!</code></pre>
+
+    <h2>Data Types</h2>
+    <pre><code>let str = "text";
+let num = 42;
+let bool = true;
+let arr = [1, 2, 3];
+let obj = { key: "value" };</code></pre>
+
+    <h2>Functions</h2>
+    <pre><code>// Declaration
+function add(a, b) { return a + b; }
+
+// Arrow function
+const add = (a, b) => a + b;
+
+// Default params
+const greet = (name = "Guest") => `Hello ${name}`;</code></pre>
+
+    <h2>DOM</h2>
+    <pre><code>const el = document.querySelector('.class');
+const all = document.querySelectorAll('p');
+el.textContent = 'new text';
+el.innerHTML = '&lt;em&gt;HTML&lt;/em&gt;';
+el.style.color = 'red';
+el.classList.add('active');
+el.classList.toggle('active');</code></pre>
+
+    <h2>Events</h2>
+    <pre><code>el.addEventListener('click', () => {
+  console.log('clicked!');
+});</code></pre>
+    <p>Common: <code>click</code>, <code>submit</code>, <code>mouseover</code>, <code>keydown</code>, <code>load</code></p>
+
+    <h2>Conditionals</h2>
+    <pre><code>if (condition) {
+  // ...
+} else if (other) {
+  // ...
+} else {
+  // ...
+}
+
+condition ? 'true case' : 'false case';  // ternary</code></pre>
+
+    <h2>Arrays</h2>
+    <pre><code>arr.length           // length
+arr.push(item)       // add to end
+arr.pop()            // remove from end
+arr.map(fn)          // transform each
+arr.filter(fn)       // keep matches
+arr.find(fn)         // first match
+arr.forEach(fn)      // loop</code></pre>
+
+    <h2>Async / Fetch</h2>
+    <pre><code>async function getData() {
+  const res = await fetch(url);
+  const data = await res.json();
+  return data;
+}</code></pre>
+
+    <h2>Comparison</h2>
+    <pre><code>===  // strict equal (USE THIS)
+!==  // strict not equal
+==   // loose equal (AVOID)
+!=   // loose not equal (AVOID)</code></pre>
+  </div>
+</body>
+</html>

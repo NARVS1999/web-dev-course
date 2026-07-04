@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0008: Laravel Relationships & Authentication</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="lesson-layout">
+  <aside class="lesson-sidebar" id="lesson-sidebar"></aside>
+  <main class="lesson-main">
+    <div class="lesson-container">
+
+      <h1>Lesson 0008: Laravel Relationships & Authentication</h1>
+      <p><em>Ikonekta ang mga modelo gamit ang Eloquent relationships at protektahan ang iyong API gamit ang Sanctum auth.</em></p>
+
+      <div class="info">
+        <strong>Lesson Goal</strong>
+        Sa lesson na ito, matututunan mo ang one-to-many relationships sa Eloquent at kung paano magdagdag ng authentication sa iyong Laravel API gamit ang Sanctum.
+      </div>
+
+      <div class="warning">
+        <strong>Prerequisite</strong>
+        Kailangan mo munang matapos ang Lesson 0007 — dapat may working Blog API ka na may Post model at database migration.
+      </div>
+
+      <!-- ======== PART 1: RELATIONSHIPS ======== -->
+      <h2>Part 1: Eloquent Relationships</h2>
+
+      <p>Sa Lesson 0007, gumawa ka ng <code>Post</code> model na may table sa database. Ngayon magdadagdag tayo ng <code>Comment</code> model para sa comments ng bawat post — ito ay <strong>one-to-many relationship</strong>.</p>
+
+      <h3>One-to-Many Relationship Pattern</h3>
+
+      <div class="tip">
+        <strong>Think of it this way</strong>
+        Isang <strong>Post</strong> ay pwedeng magkaroon ng maraming <strong>Comments</strong> → <code>Post hasMany Comment</code>.<br>
+        Ang bawat <strong>Comment</strong> ay belong sa iisang <strong>Post</strong> → <code>Comment belongsTo Post</code>.
+      </div>
+
+      <p>Gawin natin ito step-by-step.</p>
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p><strong>Create Comment model with migration:</strong></p>
+          <pre><code>php artisan make:model Comment -m</code></pre>
+          <p>Ang <code>-m</code> flag ay gumagawa ng migration file kasabay ng model.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p><strong>Edit the migration file</strong> <code>database/migrations/xxxx_create_comments_table.php</code>:</p>
+          <pre><code>public function up(): void
+{
+    Schema::create('comments', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('post_id')->constrained()->cascadeOnDelete();
+        $table->string('author');
+        $table->text('body');
+        $table->timestamps();
+    });
+}</code></pre>
+          <p>Ang <code>foreignId('post_id')->constrained()</code> ay gumagawa ng foreign key na naka-link sa <code>id</code> column ng <code>posts</code> table. Ang <code>cascadeOnDelete</code> ay automatic na magde-delete ng comments kapag ang post ay na-delete.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p><strong>Run the migration:</strong></p>
+          <pre><code>php artisan migrate</code></pre>
+        </div>
+      </div>
+
+      <h3>Defining Relationships sa Models</h3>
+
+      <p>Buksan ang <code>app/Models/Post.php</code> at idagdag ang relationship:</p>
+
+      <pre><code>&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Post extends Model
+{
+    protected $fillable = ['title', 'content'];
+
+    public function comments()
+    {
+        return $this-&gt;hasMany(Comment::class);
+    }
+}</code></pre>
+
+      <p>Ngayon, buksan ang <code>app/Models/Comment.php</code> at idagdag ang inverse relationship:</p>
+
+      <pre><code>&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Comment extends Model
+{
+    protected $fillable = ['post_id', 'author', 'body'];
+
+    public function post()
+    {
+        return $this-&gt;belongsTo(Post::class);
+    }
+}</code></pre>
+
+      <h3>Gamitin ang Relationships</h3>
+
+      <p>Sa iyong <code>routes/api.php</code>, magdagdag ng nested route para sa comments:</p>
+
+      <pre><code>use App\Models\Post;
+use App\Models\Comment;
+
+// GET /api/posts — list all posts (with comments)
+Route::get('/posts', function () {
+    return Post::with('comments')-&gt;get();
+});
+
+// GET /api/posts/{post} — single post with comments
+Route::get('/posts/{post}', function (Post $post) {
+    return $post-&gt;load('comments');
+});
+
+// POST /api/posts/{post}/comments — add a comment
+Route::post('/posts/{post}/comments', function (Post $post, Request $request) {
+    $validated = $request-&gt;validate([
+        'author' =&gt; 'required|string|max:255',
+        'body'   =&gt; 'required|string',
+    ]);
+
+    $comment = $post-&gt;comments()-&gt;create($validated);
+
+    return response()-&gt;json($comment, 201);
+});
+
+// DELETE /api/comments/{comment} — delete a comment
+Route::delete('/comments/{comment}', function (Comment $comment) {
+    $comment-&gt;delete();
+    return response()-&gt;noContent();
+});</code></pre>
+
+      <div class="tip">
+        <strong>Eager Loading</strong>
+        Ang <code>with('comments')</code> ay naglo-load ng comments sa iisang query lang (eager loading) — hindi na kailangan ng maraming database queries. Ito ay best practice para sa performance.
+      </div>
+
+      <!-- ======== PART 2: AUTHENTICATION ======== -->
+      <h2>Part 2: Laravel Sanctum Authentication</h2>
+
+      <p>Ngayong may comments na ang blog API natin, kailangan nating protektahan ito. Hindi dapat makapag-delete ng comments ang kahit sino. Dito papasok ang <strong>Laravel Sanctum</strong> — isang lightweight authentication package para sa APIs.</p>
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p><strong>Install Sanctum:</strong></p>
+          <pre><code>composer require laravel/sanctum
+
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+
+php artisan migrate</code></pre>
+          <p>Magkakaroon ito ng <code>personal_access_tokens</code> table sa database.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p><strong>Add Sanctum trait sa User model</strong> (<code>app/Models/User.php</code>):</p>
+          <pre><code>&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
+
+class User extends Authenticatable
+{
+    use HasApiTokens;
+    // ...
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>Auth Routes: Register at Login</h3>
+
+      <p>Sa <code>routes/api.php</code>, magdagdag ng public auth routes:</p>
+
+      <pre><code>use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+
+// POST /api/register
+Route::post('/register', function (Request $request) {
+    $validated = $request-&gt;validate([
+        'name'     =&gt; 'required|string|max:255',
+        'email'    =&gt; 'required|email|unique:users',
+        'password' =&gt; 'required|string|min:8|confirmed',
+    ]);
+
+    $user = User::create([
+        'name'     =&gt; $validated['name'],
+        'email'    =&gt; $validated['email'],
+        'password' =&gt; Hash::make($validated['password']),
+    ]);
+
+    $token = $user-&gt;createToken('api-token')-&gt;plainTextToken;
+
+    return response()-&gt;json(['user' =&gt; $user, 'token' =&gt; $token], 201);
+});
+
+// POST /api/login
+Route::post('/login', function (Request $request) {
+    $validated = $request-&gt;validate([
+        'email'    =&gt; 'required|email',
+        'password' =&gt; 'required|string',
+    ]);
+
+    $user = User::where('email', $validated['email'])-&gt;first();
+
+    if (! $user || ! Hash::check($validated['password'], $user-&gt;password)) {
+        throw ValidationException::withMessages([
+            'email' =&gt; ['The provided credentials are incorrect.'],
+        ]);
+    }
+
+    $token = $user-&gt;createToken('api-token')-&gt;plainTextToken;
+
+    return response()-&gt;json(['user' =&gt; $user, 'token' =&gt; $token]);
+});</code></pre>
+
+      <h3>Protecting Routes</h3>
+
+      <p>Ngayon, protektahan natin ang routes na nangangailangan ng authentication. Gamitin ang <code>auth:sanctum</code> middleware:</p>
+
+      <pre><code>// Protected routes — nangangailangan ng valid token
+Route::middleware('auth:sanctum')-&gt;group(function () {
+
+    // GET /api/user — get current user info
+    Route::get('/user', function (Request $request) {
+        return $request-&gt;user();
+    });
+
+    // POST /api/posts — create post (kailangan naka-login)
+    Route::post('/posts', function (Request $request) {
+        $validated = $request-&gt;validate([
+            'title'   =&gt; 'required|string|max:255',
+            'content' =&gt; 'required|string',
+        ]);
+
+        $post = $request-&gt;user()-&gt;posts()-&gt;create($validated);
+
+        return response()-&gt;json($post, 201);
+    });
+
+    // DELETE /api/posts/{post} — delete post (owner only)
+    Route::delete('/posts/{post}', function (Post $post) {
+        if ($request-&gt;user()-&gt;id !== $post-&gt;user_id) {
+            return response()-&gt;json(['message' =&gt; 'Forbidden'], 403);
+        }
+        $post-&gt;delete();
+        return response()-&gt;noContent();
+    });
+
+    // DELETE /api/comments/{comment}
+    Route::delete('/comments/{comment}', function (Comment $comment) {
+        $comment-&gt;delete();
+        return response()-&gt;noContent();
+    });
+});</code></pre>
+
+      <div class="tip">
+        <strong>How to use the token</strong>
+        Kapag nag-login o nag-register ang user, makakakuha sila ng token. Isama ang token na ito sa lahat ng protected requests bilang <strong>Bearer token</strong> sa <code>Authorization</code> header:<br><br>
+        <code>Authorization: Bearer 1|a1b2c3d4e5f6...</code>
+      </div>
+
+      <h3>I-update ang Post Model</h3>
+
+      <p>Kailangan din nating i-update ang <code>Post</code> model para magkaroon ng user relationship:</p>
+
+      <pre><code>class Post extends Model
+{
+    protected $fillable = ['user_id', 'title', 'content'];
+
+    public function user()
+    {
+        return $this-&gt;belongsTo(User::class);
+    }
+
+    public function comments()
+    {
+        return $this-&gt;hasMany(Comment::class);
+    }
+}</code></pre>
+
+      <p>At magdagdag ng <code>user_id</code> column sa posts table sa pamamagitan ng bagong migration:</p>
+
+      <pre><code>php artisan make:migration add_user_id_to_posts_table</code></pre>
+
+      <pre><code>public function up(): void
+{
+    Schema::table('posts', function (Blueprint $table) {
+        $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+    });
+}</code></pre>
+
+      <pre><code>php artisan migrate</code></pre>
+
+      <!-- ======== QUIZ ======== -->
+      <h2>Quick Quiz</h2>
+
+      <div class="quiz-item">
+        <div class="quiz-question">1. Anong Eloquent method ang ginagamit para sa "isang model ay may maraming child models"?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q1" value="a"> <code>hasOne()</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="b"> <code>hasMany()</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="c"> <code>belongsTo()</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback1"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">2. Aling package ang ginagamit ng Laravel para sa API token authentication?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q2" value="a"> Laravel Breeze</label>
+          <label class="quiz-option"><input type="radio" name="q2" value="b"> Laravel Sanctum</label>
+          <label class="quiz-option"><input type="radio" name="q2" value="c"> Laravel Passport</label>
+        </div>
+        <div class="quiz-feedback" id="feedback2"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">3. Paano mo isasama ang token sa isang HTTP request para sa protected route?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q3" value="a"> <code>Token: 1|abc</code> header</label>
+          <label class="quiz-option"><input type="radio" name="q3" value="b"> <code>Authorization: Bearer 1|abc</code> header</label>
+          <label class="quiz-option"><input type="radio" name="q3" value="c"> <code>api_token=1|abc</code> query parameter</label>
+        </div>
+        <div class="quiz-feedback" id="feedback3"></div>
+      </div>
+
+      <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+      <!-- ======== PROJECT ======== -->
+      <div class="project">
+        <h3>Mini-Project: Comments + Auth Integration</h3>
+        <p>Gawin nating kumpleto ang blog API:</p>
+        <ul>
+          <li>Magdagdag ng <code>Comment</code> model na may <code>post_id</code>, <code>author</code>, at <code>body</code></li>
+          <li>I-define ang <code>hasMany</code> / <code>belongsTo</code> relationships</li>
+          <li>I-install ang Sanctum at mag-setup ng register/login endpoints</li>
+          <li>I-protect ang create/delete routes gamit ang <code>auth:sanctum</code></li>
+          <li>I-test ang iyong API gamit ang curl o Postman</li>
+        </ul>
+        <p><strong>Test with curl:</strong></p>
+        <pre><code># Register
+curl -X POST http://localhost:8000/api/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Juan","email":"juan@example.com","password":"password123","password_confirmation":"password123"}'
+
+# Login (copy the token from response)
+curl -X POST http://localhost:8000/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"juan@example.com","password":"password123"}'
+
+# Create a post (replace TOKEN with actual token)
+curl -X POST http://localhost:8000/api/posts \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer TOKEN" \
+  -d '{"title":"My First Post","content":"Hello World!"}'
+
+# Add a comment (no auth needed)
+curl -X POST http://localhost:8000/api/posts/1/comments \
+  -H "Content-Type: application/json" \
+  -d '{"author":"Maria","body":"Nice post!"}'</code></pre>
+      </div>
+
+      <!-- ======== SUMMARY ======== -->
+      <h2>Summary</h2>
+      <ul>
+        <li>Ang <code>hasMany()</code> at <code>belongsTo()</code> ay ginagamit para sa one-to-many relationships</li>
+        <li>Ang <code>foreignId()->constrained()</code> ay gumagawa ng foreign key sa migration</li>
+        <li>Ang <code>with()</code> ay para sa eager loading ng relationships</li>
+        <li>Ang <strong>Laravel Sanctum</strong> ay nagbibigay ng API token authentication</li>
+        <li>Gamitin ang <code>auth:sanctum</code> middleware para protektahan ang routes</li>
+        <li>Ang token ay isinasama bilang <code>Authorization: Bearer</code> header</li>
+      </ul>
+
+      <div class="info">
+        <strong>Next Steps</strong>
+        Sa susunod na lesson (0009), matututunan mo ang <strong>API Resources</strong> para i-format ang iyong JSON responses nang propesyonal!
+      </div>
+
+      <div class="lesson-nav"></div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../assets/lessons-data.js"></script>
+<script src="../assets/lesson-nav.js"></script>
+<script src="../assets/sidebar.js"></script>
+<script>
+  function checkQuiz() {
+    var answers = { q1: 'b', q2: 'b', q3: 'b' };
+    for (var key in answers) {
+      var sel = document.querySelector('input[name="' + key + '"]:checked');
+      var fb = document.getElementById('feedback' + key.slice(1));
+      if (!sel) {
+        fb.textContent = 'Please select an answer!';
+        fb.className = 'quiz-feedback incorrect';
+        continue;
+      }
+      if (sel.value === answers[key]) {
+        fb.textContent = '\u2705 Tama! ' + (key === 'q1' ? 'Ang hasMany() ang tamang method para sa one-to-many.' : key === 'q2' ? 'Ang Sanctum ang lightweight API auth package ng Laravel.' : 'Tama! Bearer token ang standard sa API authentication.');
+        fb.className = 'quiz-feedback correct';
+      } else {
+        var hint = key === 'q1' ? 'Hint: Kapag ang isang model ay may maraming child models (e.g., Post has many Comments) — hasMany() ang gamit.' : key === 'q2' ? 'Hint: Ito ang lightweight auth package na ginawa specifically para sa SPAs at APIs.' : 'Hint: Hanapin ang "Authorization" header at "Bearer" keyword.';
+        fb.textContent = '\u274C Hindi tama. ' + hint;
+        fb.className = 'quiz-feedback incorrect';
+      }
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0002: CSS Styling</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .demo-box {
+      display: inline-block;
+      padding: 1rem 2rem;
+      margin: 0.5rem;
+      border: 2px solid #2563eb;
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+    }
+    .flex-demo {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 1rem;
+      background: #f3f4f6;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .flex-demo > div {
+      background: #2563eb;
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+    }
+    .grid-demo {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      padding: 1rem;
+      background: #f3f4f6;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .grid-demo > div {
+      background: #16a34a;
+      color: white;
+      padding: 1.5rem;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      text-align: center;
+    }
+    .color-swatch {
+      display: inline-block;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 4px;
+      vertical-align: middle;
+      margin-right: 0.25rem;
+    }
+    .code-preview {
+      padding: 0.5rem 1rem;
+      background: #f0fdf4;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body><div class="lesson-layout"><aside class="lesson-sidebar" id="lesson-sidebar"></aside><main class="lesson-main">
+  <div class="lesson-container">
+    <h1>Lesson 0002: CSS Styling</h1>
+    <p><em>Pagandahin natin ang iyong portfolio — colors, layout, at higit pa!</em></p>
+
+    <div class="info">
+      <strong>Lesson Goal</strong>
+      Sa araling ito, matututunan mo kung paano mag-istilo ng web pages gamit ang CSS — colors, fonts, layout (Flexbox & Grid), at responsive design. I-aapply mo ito sa portfolio page mo para maging presentable sa potential clients!
+    </div>
+
+    <h2>Ano ang CSS?</h2>
+    <p>
+      Ang <strong>CSS</strong> (Cascading Style Sheets) ang nagpapaganda ng website. Kung ang HTML ay ang skeleton ng tao, ang CSS ay ang damit, pampaganda, at makeup.
+    </p>
+    <ul>
+      <li><strong>Colors</strong> — background, text, borders</li>
+      <li><strong>Typography</strong> — fonts, sizes, spacing</li>
+      <li><strong>Layout</strong> — Flexbox, Grid, positioning</li>
+      <li><strong>Responsive</strong> — gumaganda sa phone, tablet, at desktop</li>
+    </ul>
+
+    <h2>3 Ways para Magdagdag ng CSS</h2>
+
+    <h3>1. Inline CSS (sa mismong tag)</h3>
+    <pre><code>&lt;p style="color: blue; font-size: 18px;"&gt;Blue text ito&lt;/p&gt;</code></pre>
+    <p class="code-preview">Result: <span style="color: blue; font-size: 18px;">Blue text ito</span></p>
+
+    <h3>2. Internal CSS (sa loob ng &lt;head&gt;)</h3>
+    <pre><code>&lt;head&gt;
+  &lt;style&gt;
+    p {
+      color: blue;
+      font-size: 18px;
+    }
+  &lt;/style&gt;
+&lt;/head&gt;</code></pre>
+
+    <h3>3. External CSS (recommended!)</h3>
+    <pre><code>&lt;head&gt;
+  &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;</code></pre>
+
+    <div class="tip">
+      <strong>Best Practice</strong>
+      Gamitin ang <strong>external CSS</strong> para sa actual projects. Ganito ang ginawa natin sa ating lessons — iisang <code>style.css</code> lang ang ginagamit ng lahat ng lessons!
+    </div>
+
+    <h2>CSS Syntax</h2>
+    <pre><code>selector {
+  property: value;
+  property: value;
+}</code></pre>
+
+    <table>
+      <tr><th>Parte</th><th>Kahulugan</th><th>Example</th></tr>
+      <tr>
+        <td><strong>Selector</strong></td>
+        <td>Sino ang iistiluhin</td>
+        <td><code>p</code>, <code>.class</code>, <code>#id</code></td>
+      </tr>
+      <tr>
+        <td><strong>Property</strong></td>
+        <td>Ano ang babaguhin</td>
+        <td><code>color</code>, <code>font-size</code>, <code>margin</code></td>
+      </tr>
+      <tr>
+        <td><strong>Value</strong></td>
+        <td>Anong value</td>
+        <td><code>red</code>, <code>16px</code>, <code>10px</code></td>
+      </tr>
+    </table>
+
+    <h2>Selectors — Paano Pumili ng Elements</h2>
+    <table>
+      <tr><th>Selector</th><th>Example</th><th>Ano ang pinipili</th></tr>
+      <tr><td><strong>Element</strong></td><td><code>p { }</code></td><td>Lahat ng <code>&lt;p&gt;</code></td></tr>
+      <tr><td><strong>Class</strong></td><td><code>.highlight { }</code></td><td>Elements na may <code>class="highlight"</code></td></tr>
+      <tr><td><strong>ID</strong></td><td><code>#header { }</code></td><td>Element na may <code>id="header"</code> (isa lang dapat)</td></tr>
+      <tr><td><strong>Descendant</strong></td><td><code>div p { }</code></td><td><code>&lt;p&gt;</code> sa loob ng <code>&lt;div&gt;</code></td></tr>
+    </table>
+
+    <pre><code>&lt;!-- HTML --&gt;
+&lt;p&gt;Ito ay naka-istilo bilang p&lt;/p&gt;
+&lt;p class="highlight"&gt;Ito ay may class="highlight"&lt;/p&gt;
+&lt;div id="header"&gt;Ito ay may id="header"&lt;/div&gt;</code></pre>
+
+    <pre><code>/* CSS */
+p { color: gray; }
+.highlight { background: yellow; font-weight: bold; }
+#header { font-size: 24px; text-align: center; }</code></pre>
+
+    <div class="tip">
+      <strong>Class vs ID</strong>
+      Gumamit ng <strong>class</strong> (.) kung uulitin mo ang style sa maraming elements. Gumamit ng <strong>ID</strong> (#) kung isa lang — gaya ng <code>#header</code> o <code>#footer</code>.
+    </div>
+
+    <h2>Colors and Backgrounds</h2>
+    <pre><code>/* Named colors */
+color: red;
+background-color: yellow;
+
+/* Hex codes — pinaka-common */
+color: #2563eb;  /* blue */
+background: #f3f4f6;  /* light gray */
+
+/* RGB */
+color: rgb(37, 99, 235);</code></pre>
+
+    <p>
+      <span class="color-swatch" style="background: #2563eb;"></span> <code>#2563eb</code> — Blue
+      <span class="color-swatch" style="background: #16a34a;"></span> <code>#16a34a</code> — Green
+      <span class="color-swatch" style="background: #d97706;"></span> <code>#d97706</code> — Amber
+      <span class="color-swatch" style="background: #dc2626;"></span> <code>#dc2626</code> — Red
+    </p>
+
+    <h2>Typography</h2>
+    <pre><code>font-family: Arial, Helvetica, sans-serif;
+font-size: 16px;
+font-weight: 700;  /* 400 = normal, 700 = bold */
+text-align: center;  /* left, center, right */
+line-height: 1.6;  /* spacing between lines */</code></pre>
+
+    <h2>Box Model — Ang Pinaka-Importanteng Concept sa CSS</h2>
+    <p>Bawat HTML element ay isang kahon. Ang Box Model ay binubuo ng 4 na layers:</p>
+
+    <pre><code>/* Margin — space sa labas ng border */
+margin: 10px;
+margin-top: 5px;
+margin: 10px 20px;  /* top/bottom left/right */
+
+/* Border — linya sa paligid */
+border: 2px solid black;
+border-radius: 8px;  /* pabilog na sulok */
+
+/* Padding — space sa loob, sa pagitan ng content at border */
+padding: 15px;
+
+/* Content — ang actual text or image */</code></pre>
+
+    <div class="info">
+      <strong>Visual Aid</strong>
+      Isipin mo na ang isang picture frame: ang <strong>content</strong> ay ang litrato, ang <strong>padding</strong> ay ang maputing border ng frame, ang <strong>border</strong> ay ang frame mismo, at ang <strong>margin</strong> ay ang layo ng frame sa ibang frame.
+    </div>
+
+    <h2>Layout: Flexbox</h2>
+    <p>Ang <strong>Flexbox</strong> ang pinakamadaling paraan para mag-arrange ng elements nang pahalang o patayo. Auto-adjust ang spacing at alignment.</p>
+
+    <pre><code>.container {
+  display: flex;
+  gap: 1rem;           /* spacing between items */
+  justify-content: center;  /* horizontal alignment */
+  align-items: center;      /* vertical alignment */
+  flex-wrap: wrap;          /* pumunta sa susunod na linya kung walang space */
+}</code></pre>
+
+    <p><strong>Result:</strong></p>
+    <div class="flex-demo">
+      <div>Item 1</div>
+      <div>Item 2</div>
+      <div>Item 3</div>
+    </div>
+
+    <table>
+      <tr><th>Property</th><th>Gamit</th><th>Values</th></tr>
+      <tr><td><code>justify-content</code></td><td>Horizontal alignment ng items</td><td><code>flex-start | center | flex-end | space-between | space-around</code></td></tr>
+      <tr><td><code>align-items</code></td><td>Vertical alignment ng items</td><td><code>flex-start | center | flex-end | stretch</code></td></tr>
+      <tr><td><code>flex-direction</code></td><td>Direction ng items</td><td><code>row | column</code></td></tr>
+      <tr><td><code>gap</code></td><td>Spacing sa pagitan ng items</td><td>Anumang CSS unit (<code>10px</code>, <code>1rem</code>)</td></tr>
+    </table>
+
+    <h2>Layout: CSS Grid</h2>
+    <p>Ang <strong>Grid</strong> naman ay para sa 2-dimensional na layout — rows at columns.</p>
+
+    <pre><code>.container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);  /* 3 equal columns */
+  gap: 0.75rem;
+}</code></pre>
+
+    <p><strong>Result:</strong></p>
+    <div class="grid-demo">
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+      <div>4</div>
+      <div>5</div>
+      <div>6</div>
+    </div>
+
+    <h2>Responsive Design</h2>
+    <p>Gamit ang <strong>media queries</strong>, pwedeng mag-iba ang style depende sa screen size:</p>
+
+    <pre><code>/* Default styles (desktop muna) */
+body { font-size: 18px; }
+.grid { grid-template-columns: repeat(3, 1fr); }
+
+/* Tablet — kapag 768px pababa */
+@media (max-width: 768px) {
+  body { font-size: 16px; }
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Phone — kapag 480px pababa */
+@media (max-width: 480px) {
+  .grid { grid-template-columns: 1fr; }
+}</code></pre>
+
+    <div class="tip">
+      <strong>Mobile-First</strong>
+      Sa modernong web dev, <strong>mobile-first</strong> ang approach — mag-design ka muna para sa phone, saka mo i-adjust para sa tablet at desktop gamit ang <code>min-width</code> sa media queries. Pero okay lang na mag-umpisa sa desktop kung beginner ka pa lang!
+    </div>
+
+    <h2>Tailwind CSS (Introduction)</h2>
+    <p>
+      Ang <strong>Tailwind CSS</strong> ay isang "utility-first" CSS framework. Sa halip na magsulat ng custom CSS, gagamit ka ng <strong>classes</strong> sa HTML mo:
+    </p>
+
+    <pre><code>&lt;!-- Regular CSS approach --&gt;
+&lt;div class="card"&gt;...&lt;/div&gt;
+&lt;style&gt;.card { background: white; padding: 1rem; border-radius: 8px; }&lt;/style&gt;
+
+&lt;!-- Tailwind approach (no custom CSS needed) --&gt;
+&lt;div class="bg-white p-4 rounded-lg"&gt;...&lt;/div&gt;</code></pre>
+
+    <p>Sa ngayon, mag-focus muna tayo sa <strong>pure CSS</strong> para maintindihan mo ang fundamentals. Darating din ang Tailwind sa advanced lessons!</p>
+
+    <h2>🛠️ Mini-Project: I-istilo ang Portfolio Mo</h2>
+
+    <div class="project">
+      <h3>Gawin Mo Ito!</h3>
+      <p>I-update ang <code>portfolio.html</code> mo — magdagdag ng CSS para maging professional ang itsura.</p>
+
+      <p><strong>Dagdagan mo ang iyong portfolio.html ng ganitong CSS (sa loob ng &lt;head&gt;):</strong></p>
+
+      <pre><code>&lt;style&gt;
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background: #f8fafc;
+    color: #1e293b;
+  }
+
+  header {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: white;
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+  }
+
+  main {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 1.5rem;
+  }
+
+  h2 {
+    color: #2563eb;
+    margin-top: 0;
+  }
+
+  footer {
+    text-align: center;
+    padding: 1rem;
+    color: #64748b;
+    font-size: 0.9rem;
+  }
+
+  a {
+    color: #2563eb;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+&lt;/style&gt;</code></pre>
+
+      <p><strong>I-save at i-reload ang browser — makikita mong nagbago ang itsura! 🎨</strong></p>
+    </div>
+
+    <h2>✅ Quiz</h2>
+
+    <div class="quiz-item">
+      <p class="quiz-question">1. Ano ang tamang paraan para pumili ng element na may <code>class="highlight"</code>?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q1" value="a"> <code>highlight { }</code></label>
+        <label class="quiz-option"><input type="radio" name="q1" value="b"> <code>.highlight { }</code></label>
+        <label class="quiz-option"><input type="radio" name="q1" value="c"> <code>#highlight { }</code></label>
+        <label class="quiz-option"><input type="radio" name="q1" value="d"> <code>class.highlight { }</code></label>
+      </div>
+      <div class="quiz-feedback" id="feedback1"></div>
+    </div>
+
+    <div class="quiz-item">
+      <p class="quiz-question">2. Aling CSS property ang ginagamit para sa space <em>sa loob</em> ng element (sa pagitan ng content at border)?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q2" value="a"> <code>margin</code></label>
+        <label class="quiz-option"><input type="radio" name="q2" value="b"> <code>padding</code></label>
+        <label class="quiz-option"><input type="radio" name="q2" value="c"> <code>gap</code></label>
+        <label class="quiz-option"><input type="radio" name="q2" value="d"> <code>spacing</code></label>
+      </div>
+      <div class="quiz-feedback" id="feedback2"></div>
+    </div>
+
+    <div class="quiz-item">
+      <p class="quiz-question">3. Ano ang <code>display: flex</code>?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q3" value="a"> Para gumawa ng grid layout</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="b"> Para itago ang isang element</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="c"> Para gumawa ng flexible layout na auto-adjust ang alignment ng items</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="d"> Para magdagdag ng flex sa muscles 💪</label>
+      </div>
+      <div class="quiz-feedback" id="feedback3"></div>
+    </div>
+
+    <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+    <h2>📖 Recommended Resources</h2>
+    <ul>
+      <li><a href="https://css-tricks.com/" target="_blank">CSS Tricks</a> — Best resource para sa Flexbox at Grid guides</li>
+      <li><a href="https://flexboxfroggy.com/" target="_blank">Flexbox Froggy</a> — Laruin mo ito para matuto ng Flexbox!</li>
+      <li><a href="https://cssgridgarden.com/" target="_blank">Grid Garden</a> — Same concept, para sa CSS Grid naman</li>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS" target="_blank">MDN CSS Reference</a> — Official documentation</li>
+    </ul>
+
+    <h2>🎯 Lesson Summary</h2>
+    <ul>
+      <li>Ang <strong>CSS</strong> ang nagpapaganda ng HTML — colors, layout, typography</li>
+      <li>3 ways to add CSS: inline, internal, external (recommended ang external)</li>
+      <li><strong>Selectors</strong>: element (<code>p</code>), class (<code>.class</code>), ID (<code>#id</code>)</li>
+      <li><strong>Box Model</strong>: content → padding → border → margin</li>
+      <li><strong>Flexbox</strong> para sa 1D layouts (row or column)</li>
+      <li><strong>Grid</strong> para sa 2D layouts (rows + columns)</li>
+      <li><strong>Media queries</strong> para sa responsive design</li>
+      <li>Na-istilo mo na ang portfolio mo! 🎨</li>
+    </ul>
+
+    <div class="info">
+      <strong>May tanong?</strong>
+      Subukan mong baguhin ang colors, fonts, at layout ng portfolio mo. Experiment ka — yan ang pinakamabisang paraan para matuto!
+    </div>
+
+    <div class="lesson-nav">
+      <a href="0001-html-foundations.html" class="nav-link nav-prev">← Previous: HTML Foundations</a>
+      <a href="0003-javascript-essentials.html" class="nav-link nav-next">Next: JavaScript Essentials →</a>
+    </div>
+
+  </div>
+
+  <script>
+    function checkQuiz() {
+      const answers = { q1: 'b', q2: 'b', q3: 'c' };
+      for (let [name, correct] of Object.entries(answers)) {
+        const selected = document.querySelector(`input[name="${name}"]:checked`);
+        const feedback = document.getElementById(`feedback${name.slice(1)}`);
+        if (!selected) {
+          feedback.textContent = 'Please select an answer!';
+          feedback.className = 'quiz-feedback incorrect';
+          continue;
+        }
+        if (selected.value === correct) {
+          feedback.textContent = '✅ Tama! Magaling!';
+          feedback.className = 'quiz-feedback correct';
+        } else {
+          let hint = '';
+          if (name === 'q1') hint = 'Hint: Class ay "." ang prefix.';
+          if (name === 'q2') hint = 'Hint: Margin ay nasa labas, Padding ay nasa loob.';
+          if (name === 'q3') hint = 'Hint: Flex ay para sa flexible at auto-adjusting layout.';
+          feedback.textContent = `❌ Hindi tama. ${hint}`;
+          feedback.className = 'quiz-feedback incorrect';
+        }
+      }
+    }
+  </script>
+</main></div><script src="../assets/lessons-data.js"></script><script src="../assets/lesson-nav.js"></script><script src="../assets/sidebar.js"></script></body>
+</html>

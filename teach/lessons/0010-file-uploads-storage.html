@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0010: File Uploads & Storage</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="lesson-layout">
+  <aside class="lesson-sidebar" id="lesson-sidebar"></aside>
+  <main class="lesson-main">
+    <div class="lesson-container">
+
+      <h1>Lesson 0010: File Uploads & Storage</h1>
+      <p><em>Mag-upload, mag-validate, at mag-serve ng files gamit ang Laravel Storage.</em></p>
+
+      <div class="info">
+        <strong>Lesson Goal</strong>
+        Matutunan kung paano mag-handle ng file uploads sa Laravel — kasama ang validation, storage (local), at pag-serve ng uploaded files sa pamamagitan ng API.
+      </div>
+
+      <!-- ======== PART 1: STORAGE BASICS ======== -->
+      <h2>Part 1: Laravel Storage</h2>
+
+      <p>Ang <strong>Laravel Storage</strong> ay isang abstraction layer para sa file storage. Pwedeng local (sa iyong server) o cloud (Amazon S3, DigitalOcean Spaces, atbp.). Sa ngayon, local storage muna ang gagamitin natin.</p>
+
+      <p>Ang default na local storage ay nagse-save ng files sa <code>storage/app/</code> directory. Pero para ma-access ang mga ito sa web, kailangan nating gumawa ng <strong>symbolic link</strong> mula sa <code>public/storage</code> papunta sa <code>storage/app/public</code>.</p>
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p><strong>Create the storage link:</strong></p>
+          <pre><code>php artisan storage:link</code></pre>
+          <p>Magagawa nito ang isang symbolic link: <code>public/storage</code> → <code>storage/app/public</code>. Ngayon, ang mga files na nasa <code>storage/app/public</code> ay maa-access sa browser sa pamamagitan ng <code>http://localhost:8000/storage/filename.jpg</code>.</p>
+        </div>
+      </div>
+
+      <!-- ======== PART 2: AVATAR UPLOAD ======== -->
+      <h2>Part 2: Profile Picture Upload (Avatar)</h2>
+
+      <p>Magdagdag tayo ng avatar upload feature sa ating User model.</p>
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p><strong>Create a migration para sa avatar column:</strong></p>
+          <pre><code>php artisan make:migration add_avatar_to_users_table</code></pre>
+
+          <pre><code>public function up(): void
+{
+    Schema::table('users', function (Blueprint $table) {
+        $table->string('avatar')->nullable()->after('email');
+    });
+}</code></pre>
+
+          <pre><code>php artisan migrate</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p><strong>Add avatar sa $fillable ng User model:</strong></p>
+          <pre><code>protected $fillable = ['name', 'email', 'password', 'avatar'];</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p><strong>Create the upload route</strong> sa <code>routes/api.php</code>:</p>
+
+          <pre><code>use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+Route::middleware('auth:sanctum')-&gt;group(function () {
+
+    // POST /api/avatar — upload profile picture
+    Route::post('/avatar', function (Request $request) {
+        $request-&gt;validate([
+            'avatar' =&gt; 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
+
+        $path = $request-&gt;file('avatar')-&gt;store('avatars', 'public');
+
+        $user = $request-&gt;user();
+        $user-&gt;avatar = $path;
+        $user-&gt;save();
+
+        $url = Storage::url($path);
+
+        return response()-&gt;json([
+            'message' =&gt; 'Avatar uploaded successfully',
+            'avatar'  =&gt; $url,
+        ]);
+    });
+
+    // GET /api/user — get user profile with avatar URL
+    Route::get('/user', function (Request $request) {
+        $user = $request-&gt;user();
+        return response()-&gt;json([
+            'id'     =&gt; $user-&gt;id,
+            'name'   =&gt; $user-&gt;name,
+            'email'  =&gt; $user-&gt;email,
+            'avatar' =&gt; $user-&gt;avatar ? Storage::url($user-&gt;avatar) : null,
+        ]);
+    });
+});</code></pre>
+        </div>
+      </div>
+
+      <div class="tip">
+        <strong>Validation Rules Explained</strong>
+        <ul>
+          <li><code>required</code> — kailangang may file</li>
+          <li><code>image</code> — dapat ito ay isang image file (JPEG, PNG, GIF, BMP, o WebP)</li>
+          <li><code>mimes:jpeg,png,jpg,gif,webp</code> — specific file types lang ang allowed</li>
+          <li><code>max:2048</code> — maximum file size sa kilobytes (2048KB = 2MB)</li>
+        </ul>
+      </div>
+
+      <h3>Testing the Upload</h3>
+
+      <p>Gamit ang curl, i-test ang avatar upload:</p>
+
+      <pre><code># Login first and get the token
+TOKEN="your-api-token-here"
+
+# Upload avatar
+curl -X POST http://localhost:8000/api/avatar \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "avatar=@/path/to/profile.jpg"
+
+# Expected response:
+# {
+#   "message": "Avatar uploaded successfully",
+#   "avatar": "http://localhost:8000/storage/avatars/abc123.jpg"
+# }
+
+# Get user profile (with avatar URL)
+curl http://localhost:8000/api/user \
+  -H "Authorization: Bearer $TOKEN"</code></pre>
+
+      <!-- ======== PART 3: FILE STORAGE METHODS ======== -->
+      <h2>Part 3: Storage Methods at Best Practices</h2>
+
+      <h3>Common Storage Methods</h3>
+
+      <table>
+        <tr>
+          <th>Method</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>Storage::put('path', $contents)</code></td>
+          <td>Mag-save ng file gamit ang string contents</td>
+        </tr>
+        <tr>
+          <td><code>$file->store('path')</code></td>
+          <td>Mag-store ng uploaded file sa given path</td>
+        </tr>
+        <tr>
+          <td><code>$file->storeAs('path', 'name.jpg')</code></td>
+          <td>Mag-store na may specific filename</td>
+        </tr>
+        <tr>
+          <td><code>Storage::url('path')</code></td>
+          <td>Kunin ang public URL ng file</td>
+        </tr>
+        <tr>
+          <td><code>Storage::delete('path')</code></td>
+          <td>Delete ng file</td>
+        </tr>
+        <tr>
+          <td><code>Storage::exists('path')</code></td>
+          <td>Check kung may file</td>
+        </tr>
+      </table>
+
+      <div class="warning">
+        <strong>Security Reminder</strong>
+        <ul>
+          <li>Laging mag-validate ng uploaded files — huwag basta-basta magtiwala sa filename o extension</li>
+          <li>Gamitin ang <code>image</code> rule para sa images — hindi lang extension ang chine-check nito, pati ang actual file content</li>
+          <li>Mag-set ng maximum file size para maiwasan ang server overload</li>
+          <li>Huwag gamitin ang original filename mula sa user — gamitin ang <code>store()</code> na nag-ge-generate ng unique filename</li>
+        </ul>
+      </div>
+
+      <h3>Deleting Old Avatars</h3>
+
+      <p>Kapag nag-upload ng bagong avatar, dapat idelete ang luma para hindi kumain ng disk space:</p>
+
+      <pre><code>use Illuminate\Support\Facades\Storage;
+
+Route::middleware('auth:sanctum')-&gt;post('/avatar', function (Request $request) {
+    $request-&gt;validate([
+        'avatar' =&gt; 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+    ]);
+
+    $user = $request-&gt;user();
+
+    // Delete old avatar kung mayroon
+    if ($user-&gt;avatar &amp;&amp; Storage::disk('public')-&gt;exists($user-&gt;avatar)) {
+        Storage::disk('public')-&gt;delete($user-&gt;avatar);
+    }
+
+    // Store new avatar
+    $path = $request-&gt;file('avatar')-&gt;store('avatars', 'public');
+    $user-&gt;avatar = $path;
+    $user-&gt;save();
+
+    return response()-&gt;json([
+        'message' =&gt; 'Avatar updated successfully',
+        'avatar'  =&gt; Storage::url($path),
+    ]);
+});</code></pre>
+
+      <!-- ======== QUIZ ======== -->
+      <h2>Quick Quiz</h2>
+
+      <div class="quiz-item">
+        <div class="quiz-question">1. Anong command ang ginagamit para ma-access ang storage files sa browser?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q1" value="a"> <code>php artisan storage:publish</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="b"> <code>php artisan storage:link</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="c"> <code>php artisan storage:serve</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback1"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">2. Saang directory nagse-save ang <code>disk('public')</code>?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q2" value="a"> <code>storage/app/</code></label>
+          <label class="quiz-option"><input type="radio" name="q2" value="b"> <code>public/</code></label>
+          <label class="quiz-option"><input type="radio" name="q2" value="c"> <code>storage/app/public/</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback2"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">3. Aling validation rule ang pumipigil sa pag-upload ng file na mas malaki sa 2MB?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q3" value="a"> <code>size:2048</code></label>
+          <label class="quiz-option"><input type="radio" name="q3" value="b"> <code>max:2048</code></label>
+          <label class="quiz-option"><input type="radio" name="q3" value="c"> <code>limit:2048</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback3"></div>
+      </div>
+
+      <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+      <!-- ======== PROJECT ======== -->
+      <div class="project">
+        <h3>Mini-Project: Avatar Upload API</h3>
+        <p>Gawin ang kumpletong file upload feature:</p>
+        <ul>
+          <li>Magdagdag ng <code>avatar</code> column sa users table</li>
+          <li>I-setup ang storage link (<code>php artisan storage:link</code>)</li>
+          <li>Gumawa ng <code>POST /api/avatar</code> endpoint na may validation</li>
+          <li>I-handle ang pag-delete ng old avatar kapag may nag-upload ng bago</li>
+          <li>I-update ang <code>GET /api/user</code> para isama ang avatar URL</li>
+          <li>I-test gamit ang curl o Postman</li>
+        </ul>
+      </div>
+
+      <!-- ======== SUMMARY ======== -->
+      <h2>Summary</h2>
+      <ul>
+        <li>Ang <code>php artisan storage:link</code> ay ginagawang accessible ang storage files sa browser</li>
+        <li>Ang <code>$file->store('path', 'disk')</code> ay nagse-save ng uploaded file</li>
+        <li>Ang <code>Storage::url()</code> ay kumukuha ng public URL ng file</li>
+        <li>Ang <code>disk('public')</code> ay tumutukoy sa <code>storage/app/public/</code></li>
+        <li>Laging mag-validate ng file types at sizes bago mag-upload</li>
+        <li>I-delete ang old files para hindi kumain ng disk space</li>
+      </ul>
+
+      <div class="info">
+        <strong>Phase 2 Complete!</strong>
+        Binabati kita! Natapos mo na ang <strong>Phase 2: Backend & Database</strong>. Mula MySQL hanggang sa Laravel file uploads — marami ka nang natutunan! Ang susunod ay <strong>Phase 3: Advanced Frontend</strong> kung saan matututo ka ng Next.js.
+      </div>
+
+      <div class="lesson-nav"></div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../assets/lessons-data.js"></script>
+<script src="../assets/lesson-nav.js"></script>
+<script src="../assets/sidebar.js"></script>
+<script>
+  function checkQuiz() {
+    var answers = { q1: 'b', q2: 'c', q3: 'b' };
+    for (var key in answers) {
+      var sel = document.querySelector('input[name="' + key + '"]:checked');
+      var fb = document.getElementById('feedback' + key.slice(1));
+      if (!sel) {
+        fb.textContent = 'Please select an answer!';
+        fb.className = 'quiz-feedback incorrect';
+        continue;
+      }
+      if (sel.value === answers[key]) {
+        fb.textContent = '\u2705 Tama! ' + (key === 'q1' ? 'Ang storage:link ang gumagawa ng symlink para ma-access ang files sa browser.' : key === 'q2' ? 'Ang "public" disk ay nagse-save sa storage/app/public/.' : 'Ang max:2048 ang nagli-limit ng file size sa 2MB.');
+        fb.className = 'quiz-feedback correct';
+      } else {
+        var hint = key === 'q1' ? 'Hint: Ang command ay may salitang "link" — gumagawa ito ng connection sa pagitan ng dalawang directories.' : key === 'q2' ? 'Hint: Ang "public" disk ay naka-configure sa config/filesystems.php.' : 'Hint: Ang keyword ay "max" — maximum file size.';
+        fb.textContent = '\u274C Hindi tama. ' + hint;
+        fb.className = 'quiz-feedback incorrect';
+      }
+    }
+  }
+</script>
+</body>
+</html>

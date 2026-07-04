@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0011: Next.js Foundations</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="lesson-layout">
+  <aside class="lesson-sidebar" id="lesson-sidebar"></aside>
+  <main class="lesson-main">
+    <div class="lesson-container">
+
+      <h1>Lesson 0011: Next.js Foundations</h1>
+      <p><em>Gawing moderno at mabilis ang iyong frontend gamit ang Next.js — ang React framework para sa production.</em></p>
+
+      <div class="info">
+        <strong>Lesson Goal</strong>
+        Matutunan ang pundasyon ng Next.js: project setup, file-based routing, pages, layouts, at navigation — at ma-deploy ang isang multi-page portfolio site.
+      </div>
+
+      <!-- ======== PART 1: WHAT IS NEXT.JS ======== -->
+      <h2>Part 1: Ano ang Next.js?</h2>
+
+      <p>Ang <strong>Next.js</strong> ay isang React framework na nagbibigay ng:</p>
+      <ul>
+        <li><strong>Server-Side Rendering (SSR)</strong> — nagre-render ng React components sa server bago ipadala sa browser</li>
+        <li><strong>Static Site Generation (SSG)</strong> — gumagawa ng HTML files sa build time</li>
+        <li><strong>File-based Routing</strong> — ang filename mo na ang bahala sa routing (hindi na kailangan ng React Router)</li>
+        <li><strong>API Routes</strong> — pwedeng magkaroon ng backend endpoints sa loob ng iyong frontend project</li>
+      </ul>
+
+      <div class="tip">
+        <strong>Bakit Next.js vs plain React?</strong>
+        Sa plain React (Create React App), lahat ay client-side rendered — ibig sabihin, empty HTML ang natatanggap ng browser at JavaScript na ang gagawa ng lahat. Problema: mabagal ang initial load at hindi SEO-friendly. Solusyon: Next.js na may SSR/SSG.
+      </div>
+
+      <h2>Part 2: Project Setup</h2>
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p><strong>Install Node.js</strong> — kung wala ka pa, i-download sa <a href="https://nodejs.org" target="_blank">nodejs.org</a> (LTS version).</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p><strong>Create a Next.js project:</strong></p>
+          <pre><code>npx create-next-app@latest my-portfolio
+cd my-portfolio</code></pre>
+          <p>Sagutin ang prompts:
+            <ul>
+              <li>Would you like to use TypeScript? <strong>No</strong> (for now)</li>
+              <li>Would you like to use ESLint? <strong>Yes</strong></li>
+              <li>Would you like to use Tailwind CSS? <strong>No</strong></li>
+              <li>Would you like to use App Router? <strong>No</strong> (use Pages Router for now)</li>
+              <li>Would you like to customize the import alias? <strong>No</strong></li>
+            </ul>
+          </p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p><strong>Run the development server:</strong></p>
+          <pre><code>npm run dev</code></pre>
+          <p>Buksan ang <code>http://localhost:3000</code> — makikita mo ang default Next.js page.</p>
+        </div>
+      </div>
+
+      <h3>Project Structure</h3>
+      <pre><code>my-portfolio/
+├── pages/           # Routes — bawat file ay isang page
+│   ├── index.js     # → /
+│   ├── about.js     # → /about
+│   └── _app.js      # Root component (layout, global CSS)
+├── public/          # Static files (images, fonts)
+├── styles/          # CSS files
+├── package.json
+└── next.config.js</code></pre>
+
+      <div class="tip">
+        <strong>Pages Router vs App Router</strong>
+        Simula sa Next.js 13, may dalawang routing systems. Ang <strong>Pages Router</strong> (gamit natin dito) ay ang traditional at mas madaling matutunan. Ang <strong>App Router</strong> ay ang bago na may React Server Components — mas powerful pero mas complex. Master muna natin ang Pages Router.
+      </div>
+
+      <!-- ======== PART 3: PAGES & ROUTING ======== -->
+      <h2>Part 3: Pages & File-Based Routing</h2>
+
+      <p>Sa Next.js, ang routing ay <strong>file-based</strong>. Ibig sabihin, ang directory at filename mo na ang magde-determine ng URL:</p>
+
+      <table>
+        <tr><th>File</th><th>URL</th></tr>
+        <tr><td><code>pages/index.js</code></td><td><code>/</code></td></tr>
+        <tr><td><code>pages/about.js</code></td><td><code>/about</code></td></tr>
+        <tr><td><code>pages/blog/index.js</code></td><td><code>/blog</code></td></tr>
+        <tr><td><code>pages/blog/[slug].js</code></td><td><code>/blog/my-post</code> (dynamic)</td></tr>
+      </table>
+
+      <p>Gumawa tayo ng mga page:</p>
+
+      <pre><code>// pages/index.js — Home page
+export default function Home() {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Welcome to My Portfolio&lt;/h1&gt;
+      &lt;p&gt;Hi! Ako si Juan — web developer.&lt;/p&gt;
+      &lt;a href="/about"&gt;Learn more about me&lt;/a&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+      <pre><code>// pages/about.js — About page
+export default function About() {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;About Me&lt;/h1&gt;
+      &lt;p&gt;I build web apps with Laravel &amp; Next.js.&lt;/p&gt;
+      &lt;a href="/"&gt;Back to Home&lt;/a&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+      <h3>Navigation with <code>Link</code></h3>
+
+      <p>Huwag gumamit ng regular na <code>&lt;a&gt;</code> tag para sa internal navigation — gumamit ng <code>Link</code> component para sa client-side navigation (walang page reload):</p>
+
+      <pre><code>import Link from 'next/link';
+
+export default function Home() {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Welcome to My Portfolio&lt;/h1&gt;
+      &lt;p&gt;Hi! Ako si Juan — web developer.&lt;/p&gt;
+      &lt;Link href="/about"&gt;Learn more about me&lt;/Link&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+      <div class="warning">
+        <strong>Important</strong>
+        Ang <code>Link</code> ay <strong>client-side navigation</strong> — hindi nagre-reload ang page, mas mabilis ang transitions. Pero ang <code>&lt;a&gt;</code> naman ay magti-trigger ng full page reload. Gamitin ang <code>Link</code> para sa internal links at <code>&lt;a&gt;</code> para sa external links.
+      </div>
+
+      <!-- ======== PART 4: LAYOUTS ======== -->
+      <h2>Part 4: Shared Layout</h2>
+
+      <p>Sa halip na ulit-ulitin ang header at footer sa bawat page, gumawa tayo ng layout component:</p>
+
+      <pre><code>// components/Layout.js
+import Link from 'next/link';
+
+export default function Layout({ children }) {
+  return (
+    &lt;div&gt;
+      &lt;nav&gt;
+        &lt;Link href="/"&gt;Home&lt;/Link&gt;
+        &lt;Link href="/about"&gt;About&lt;/Link&gt;
+        &lt;Link href="/blog"&gt;Blog&lt;/Link&gt;
+      &lt;/nav&gt;
+      &lt;main&gt;{children}&lt;/main&gt;
+      &lt;footer&gt;&amp;copy; 2026 My Portfolio&lt;/footer&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+      <p>At gamitin ito sa <code>pages/_app.js</code> para ma-apply sa lahat ng pages:</p>
+
+      <pre><code>// pages/_app.js
+import Layout from '../components/Layout';
+import '../styles/globals.css';
+
+export default function App({ Component, pageProps }) {
+  return (
+    &lt;Layout&gt;
+      &lt;Component {...pageProps} /&gt;
+    &lt;/Layout&gt;
+  );
+}</code></pre>
+
+      <div class="tip">
+        <strong>How _app.js works</strong>
+        Ang <code>_app.js</code> ay ang <strong>root component</strong> ng Next.js — lahat ng pages ay dumadaan dito. Dito mo nilalagay ang global styles, layout, at providers (context, auth, atbp.).
+      </div>
+
+      <!-- ======== QUIZ ======== -->
+      <h2>Quick Quiz</h2>
+
+      <div class="quiz-item">
+        <div class="quiz-question">1. Anong URL ang tutugma sa file na <code>pages/blog/[slug].js</code>?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q1" value="a"> <code>/blog/[slug]</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="b"> <code>/blog/my-first-post</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="c"> <code>/blog/slug</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback1"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">2. Aling component ang dapat gamitin para sa internal navigation sa Next.js?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q2" value="a"> <code>&lt;a&gt;</code></label>
+          <label class="quiz-option"><input type="radio" name="q2" value="b"> <code>&lt;Link&gt;</code></label>
+          <label class="quiz-option"><input type="radio" name="q2" value="c"> <code>&lt;Nav&gt;</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback2"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">3. Saan mo ilalagay ang shared layout para ma-apply sa lahat ng pages?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q3" value="a"> <code>pages/index.js</code></label>
+          <label class="quiz-option"><input type="radio" name="q3" value="b"> <code>pages/_app.js</code></label>
+          <label class="quiz-option"><input type="radio" name="q3" value="c"> <code>next.config.js</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback3"></div>
+      </div>
+
+      <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+      <!-- ======== PROJECT ======== -->
+      <div class="project">
+        <h3>Mini-Project: Multi-Page Portfolio</h3>
+        <p>Gawin ang iyong personal portfolio website gamit ang Next.js:</p>
+        <ul>
+          <li>Gumawa ng Next.js project: <code>npx create-next-app@latest my-portfolio</code></li>
+          <li>Gumawa ng Home page (<code>/</code>) na may introduction</li>
+          <li>Gumawa ng About page (<code>/about</code>) na may skills at experience</li>
+          <li>Gumawa ng Blog page (<code>/blog</code>) na may listahan ng articles</li>
+          <li>Gumawa ng Layout component na may navigation</li>
+          <li>I-apply ang layout sa <code>_app.js</code></li>
+          <li>Gamitin ang <code>Link</code> component sa navigation</li>
+        </ul>
+      </div>
+
+      <!-- ======== SUMMARY ======== -->
+      <h2>Summary</h2>
+      <ul>
+        <li>Ang Next.js ay isang React framework na may SSR, SSG, at file-based routing</li>
+        <li>Ang <code>create-next-app</code> ang pinakamabilis na paraan para magsimula</li>
+        <li>Ang <strong>file-based routing</strong> ay gumagamit ng filesystem para sa URL structure</li>
+        <li>Ang <code>Link</code> component ay para sa client-side navigation</li>
+        <li>Ang <code>_app.js</code> ay para sa global layouts at styles</li>
+      </ul>
+
+      <div class="info">
+        <strong>Next Steps</strong>
+        Sa susunod na lesson (0012), matututunan mo ang <strong>Data Fetching</strong> — kung paano kumuha ng data mula sa iyong Laravel API at i-render ito gamit ang SSG, SSR, at ISR!
+      </div>
+
+      <div class="lesson-nav"></div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../assets/lessons-data.js"></script>
+<script src="../assets/lesson-nav.js"></script>
+<script src="../assets/sidebar.js"></script>
+<script>
+  function checkQuiz() {
+    var answers = { q1: 'b', q2: 'b', q3: 'b' };
+    for (var key in answers) {
+      var sel = document.querySelector('input[name="' + key + '"]:checked');
+      var fb = document.getElementById('feedback' + key.slice(1));
+      if (!sel) { fb.textContent = 'Please select an answer!'; fb.className = 'quiz-feedback incorrect'; continue; }
+      if (sel.value === answers[key]) {
+        fb.textContent = '\u2705 Tama! ' + (key === 'q1' ? 'Ang [slug] ay dynamic — kaya ang /blog/my-first-post ang tutugma.' : key === 'q2' ? 'Ang Link component ang gamit para sa client-side navigation.' : 'Ang _app.js ang root component para sa lahat ng pages.');
+        fb.className = 'quiz-feedback correct';
+      } else {
+        fb.textContent = '\u274C Hindi tama. ' + (key === 'q1' ? 'Hint: Ang [slug] ay dynamic segment — kahit anong word pwedeng ilagay.' : key === 'q2' ? 'Hint: Import ito mula sa next/link.' : 'Hint: Ito ang file na nag-wrap sa lahat ng pages.');
+        fb.className = 'quiz-feedback incorrect';
+      }
+    }
+  }
+</script>
+</body>
+</html>

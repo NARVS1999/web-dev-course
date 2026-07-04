@@ -1,0 +1,49 @@
+{
+  "title": "Web Development Course",
+  "description": "Zero to freelancing-ready web developer",
+  "totalLessons": 20,
+  "completed": 20,
+  "inProgress": 0,
+  "pending": 0,
+  "lastUpdated": "2026-07-04",
+  "phases": [
+    {
+      "name": "Phase 1: Frontend Fundamentals",
+      "lessons": ["0001", "0002", "0003", "0004"]
+    },
+    {
+      "name": "Phase 2: Backend & Database",
+      "lessons": ["0005", "0006", "0007", "0008", "0009", "0010"]
+    },
+    {
+      "name": "Phase 3: Advanced Frontend (Next.js)",
+      "lessons": ["0011", "0012", "0013", "0014"]
+    },
+    {
+      "name": "Phase 4: Mobile & Deployment",
+      "lessons": ["0015", "0016", "0017", "0018", "0019", "0020"]
+    }
+  ],
+  "lessons": [
+    { "id": "0001", "title": "HTML Foundations", "file": "0001-html-foundations.html", "status": "completed", "topics": ["HTML tags", "semantic HTML", "document structure"], "prerequisites": [] },
+    { "id": "0002", "title": "CSS Styling", "file": "0002-css-styling.html", "status": "completed", "topics": ["selectors", "box model", "flexbox", "grid", "responsive"], "prerequisites": ["0001"] },
+    { "id": "0003", "title": "JavaScript Essentials", "file": "0003-javascript-essentials.html", "status": "completed", "topics": ["variables", "functions", "DOM", "events", "fetch API"], "prerequisites": ["0001", "0002"] },
+    { "id": "0004", "title": "Git & GitHub", "file": "0004-git-and-github.html", "status": "completed", "topics": ["git workflow", "branches", "PRs", "GitHub pages"], "prerequisites": [] },
+    { "id": "0005", "title": "MySQL & Database Basics", "file": "0005-mysql-database-basics.html", "status": "completed", "topics": ["SQL", "tables", "keys", "joins", "phpMyAdmin"], "prerequisites": [] },
+    { "id": "0006", "title": "Laravel Setup & Routing", "file": "0006-laravel-setup-routing-controllers.html", "status": "completed", "topics": ["Composer", "Laravel", "routing", "controllers", "Blade"], "prerequisites": ["0005"] },
+    { "id": "0007", "title": "Migrations & Eloquent ORM", "file": "0007-laravel-migrations-eloquent-crud.html", "status": "completed", "topics": ["migrations", "Eloquent", "CRUD", "relationships"], "prerequisites": ["0005", "0006"] },
+    { "id": "0008", "title": "Relationships & Auth", "file": "0008-laravel-relationships-authentication.html", "status": "completed", "topics": ["one-to-many", "Sanctum", "API tokens", "auth middleware"], "prerequisites": ["0007"] },
+    { "id": "0009", "title": "API Resources & JSON", "file": "0009-api-resources-json.html", "status": "completed", "topics": ["API Resources", "collections", "pagination", "JSON structure"], "prerequisites": ["0008"] },
+    { "id": "0010", "title": "File Uploads & Storage", "file": "0010-file-uploads-storage.html", "status": "completed", "topics": ["file upload", "validation", "Storage facade", "symbolic link"], "prerequisites": ["0008"] },
+    { "id": "0011", "title": "Next.js Foundations", "file": "0011-nextjs-foundations.html", "status": "completed", "topics": ["create-next-app", "file-based routing", "pages", "layouts", "Link component"], "prerequisites": ["0003"] },
+    { "id": "0012", "title": "Next.js Data Fetching", "file": "0012-nextjs-data-fetching.html", "status": "completed", "topics": ["getStaticProps", "getServerSideProps", "ISR", "SWR"], "prerequisites": ["0011"] },
+    { "id": "0013", "title": "Next.js API Routes", "file": "0013-nextjs-api-routes.html", "status": "completed", "topics": ["API routes", "dynamic routes", "middleware", "env variables"], "prerequisites": ["0011", "0012"] },
+    { "id": "0014", "title": "Next.js Deployment", "file": "0014-nextjs-deployment.html", "status": "completed", "topics": ["Vercel", "build", "environment variables", "custom domain"], "prerequisites": ["0013"] },
+    { "id": "0015", "title": "React Native Basics", "file": "0015-react-native-basics.html", "status": "completed", "topics": ["Expo", "core components", "StyleSheet", "Flexbox", "Expo Go"], "prerequisites": ["0003"] },
+    { "id": "0016", "title": "React Native Navigation", "file": "0016-react-native-navigation.html", "status": "completed", "topics": ["React Navigation", "Stack Navigator", "Bottom Tab Navigator", "params"], "prerequisites": ["0015"] },
+    { "id": "0017", "title": "React Native API Integration", "file": "0017-react-native-api-integration.html", "status": "completed", "topics": ["fetch", "FlatList", "AsyncStorage", "pull-to-refresh", "caching"], "prerequisites": ["0015", "0016"] },
+    { "id": "0018", "title": "Deployment & Portfolio", "file": "0018-deployment-portfolio.html", "status": "completed", "topics": ["cPanel", "shared hosting", "portfolio", "production Laravel"], "prerequisites": ["0010", "0014"] },
+    { "id": "0019", "title": "Final Project", "file": "0019-final-project.html", "status": "completed", "topics": ["full-stack project", "API design", "project planning", "integration"], "prerequisites": ["0017", "0018"] },
+    { "id": "0020", "title": "Freelancing Guide", "file": "0020-freelancing-guide.html", "status": "completed", "topics": ["Upwork", "proposals", "pricing", "client communication", "portfolio"], "prerequisites": ["0019"] }
+  ]
+}

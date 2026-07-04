@@ -1,0 +1,60 @@
+{
+  "mission": "Learn web development to start freelancing",
+  "language": "Taglish",
+  "platform": "Windows",
+  "budget": "free",
+  "total_lessons": 22,
+  "completed": 7,
+  "pending": 15,
+  "current_lesson": "0007-laravel-migrations-eloquent-crud",
+  "next_lesson": "0008-laravel-relationships-authentication",
+  "phases": [
+    {
+      "name": "Fundamentals",
+      "lessons": [
+        { "id": "0001", "title": "HTML Foundations", "status": "completed" },
+        { "id": "0002", "title": "CSS Styling (Flexbox, Grid, Responsive, Tailwind basics)", "status": "completed" },
+        { "id": "0003", "title": "JavaScript Essentials (ES6+, DOM, Async/Await, Fetch)", "status": "completed" },
+        { "id": "0004", "title": "Git & GitHub for Freelancers", "status": "completed" }
+      ]
+    },
+    {
+      "name": "Database & Backend (Laravel + MySQL)",
+      "lessons": [
+        { "id": "0005", "title": "MySQL & Database Basics", "status": "completed" },
+        { "id": "0006", "title": "Laravel Setup, Routing, Controllers, Blade", "status": "completed" },
+        { "id": "0007", "title": "Laravel Migrations, Eloquent ORM, CRUD", "status": "completed" },
+        { "id": "0008", "title": "Laravel Relationships & Authentication", "status": "pending" },
+        { "id": "0009", "title": "Laravel API Resources, Validation, Error Handling", "status": "pending" },
+        { "id": "0010", "title": "Laravel File Uploads, Queue, Events", "status": "pending" }
+      ]
+    },
+    {
+      "name": "Frontend Web (Next.js)",
+      "lessons": [
+        { "id": "0011", "title": "React Basics (Components, Props, State, Hooks)", "status": "pending" },
+        { "id": "0012", "title": "Next.js Setup, Pages Router, SSR vs CSR", "status": "pending" },
+        { "id": "0013", "title": "Next.js API Routes & Data Fetching", "status": "pending" },
+        { "id": "0014", "title": "Next.js Authentication (JWT / NextAuth)", "status": "pending" }
+      ]
+    },
+    {
+      "name": "Mobile (React Native + Expo)",
+      "lessons": [
+        { "id": "0015", "title": "Expo Setup, Core Components", "status": "pending" },
+        { "id": "0016", "title": "React Navigation (Stack, Bottom Tabs)", "status": "pending" },
+        { "id": "0017", "title": "API Integration & AsyncStorage", "status": "pending" },
+        { "id": "0018", "title": "Device Features (Camera, Permissions)", "status": "pending" }
+      ]
+    },
+    {
+      "name": "Integration & Deployment",
+      "lessons": [
+        { "id": "0019", "title": "CORS, Environment Variables Setup", "status": "pending" },
+        { "id": "0020", "title": "Deploy Laravel (Render free tier)", "status": "pending" },
+        { "id": "0021", "title": "Deploy Next.js (Vercel free tier)", "status": "pending" },
+        { "id": "0022", "title": "Deploy React Native (Expo Build)", "status": "pending" }
+      ]
+    }
+  ]
+}

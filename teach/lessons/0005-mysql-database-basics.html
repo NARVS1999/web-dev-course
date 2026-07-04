@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0005: MySQL & Database Basics</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body><div class="lesson-layout"><aside class="lesson-sidebar" id="lesson-sidebar"></aside><main class="lesson-main">
+  <div class="lesson-container">
+    <h1>Lesson 0005: MySQL & Database Basics</h1>
+    <p><em>Ang pundasyon ng data — kung paano nag-iimbak at kumukuha ng impormasyon ang iyong apps!</em></p>
+
+    <div class="info">
+      <strong>Lesson Goal</strong>
+      Matututunan mo ang database fundamentals: tables, SQL queries, keys, at relationships. I-install mo ang XAMPP, gagawa ng database gamit ang phpMyAdmin, at magsusulat ng SQL queries — lahat sa local machine mo nang libre!
+    </div>
+
+    <h2>Ano ang Database?</h2>
+    <p>
+      Ang <strong>database</strong> ay isang organisadong koleksyon ng data. Isipin mo na lang na parang <strong>Excel spreadsheet</strong> — may rows at columns. Pero mas powerful ang databases dahil:
+    </p>
+    <ul>
+      <li>Milyon-milyong records kaya mong i-handle</li>
+      <li>Mabilis mag-search at mag-filter</li>
+      <li>Pwedeng mag-relate ang iba't ibang tables sa isa't isa</li>
+      <li>Secure at may user permissions</li>
+    </ul>
+
+    <p>Ang <strong>MySQL</strong> ay isa sa pinakasikat na database management system. Libre ito at gamit na gamit sa web development — lalo na sa Laravel.</p>
+
+    <blockquote>
+      <strong>Analogy:</strong> Ang database ay parang <strong>library</strong>. Ang <strong>tables</strong> ay ang mga bookshelves (isa para sa books, isa para sa authors, isa para sa borrowers). Ang <strong>rows</strong> ay ang mga indibidwal na libro. Ang <strong>columns</strong> ay ang impormasyon tungkol sa bawat libro (title, author, year, ISBN).
+    </blockquote>
+
+    <h2>Step 1: Install XAMPP</h2>
+
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <p>Pumunta sa <a href="https://www.apachefriends.org/" target="_blank">apachefriends.org</a> at i-download ang XAMPP para sa Windows.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <p>I-install ito. <strong>Default settings lang.</strong> Piliin ang Apache, MySQL, at phpMyAdmin.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">3</div>
+      <div class="step-content">
+        <p>I-open ang <strong>XAMPP Control Panel</strong> at i-click ang <strong>Start</strong> para sa Apache at MySQL.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">4</div>
+      <div class="step-content">
+        <p>I-open ang browser at pumunta sa <code>http://localhost/phpmyadmin</code> — makikita mo ang phpMyAdmin interface!</p>
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>Alternative: Laragon</strong>
+      Kung gusto mo ng mas modernong alternative sa XAMPP, i-install ang <a href="https://laragon.org/" target="_blank">Laragon</a>. Mas maganda ang UI at mas madaling mag-switch ng PHP versions. Same lang ang MySQL at phpMyAdmin na makukuha mo.
+    </div>
+
+    <h2>Database Concepts</h2>
+
+    <h3>Tables, Rows, at Columns</h3>
+    <pre><code>Table: users
++----+--------+---------------------+-----------+
+| id | name   | email               | age       |
++----+--------+---------------------+-----------+
+| 1  | Juan   | juan@example.com    | 25        |
+| 2  | Maria  | maria@example.com   | 30        |
+| 3  | Pedro  | pedro@example.com   | 22        |
++----+--------+---------------------+-----------+
+  ↑      ↑           ↑                  ↑
+  id     name        email              age
+(column)(column)    (column)          (column)</code></pre>
+
+    <ul>
+      <li><strong>Table</strong> — ang lalagyan ng data (parang Excel sheet)</li>
+      <li><strong>Row</strong> — isang record (isang user)</li>
+      <li><strong>Column</strong> — isang attribute ng record (name, email)</li>
+    </ul>
+
+    <h3>Data Types</h3>
+    <table>
+      <tr><th>Data Type</th><th>Gamit</th><th>Example</th></tr>
+      <tr><td><code>INT</code></td><td>Whole numbers</td><td><code>25</code>, <code>100</code>, <code>-5</code></td></tr>
+      <tr><td><code>VARCHAR(255)</code></td><td>Maikling text (max 255 chars)</td><td><code>"Juan"</code>, <code>"juan@email.com"</code></td></tr>
+      <tr><td><code>TEXT</code></td><td>Mahabang text</td><td><code>"Blog post content..."</code></td></tr>
+      <tr><td><code>BOOLEAN</code></td><td>True or false</td><td><code>1</code> (true), <code>0</code> (false)</td></tr>
+      <tr><td><code>DATE</code></td><td>Date lang</td><td><code>2026-07-04</code></td></tr>
+      <tr><td><code>DATETIME</code></td><td>Date at time</td><td><code>2026-07-04 14:30:00</code></td></tr>
+      <tr><td><code>DECIMAL(10,2)</code></td><td>Pera o precise numbers</td><td><code>99.99</code>, <code>1000.50</code></td></tr>
+    </table>
+
+    <h3>Primary Key</h3>
+    <p>
+      Ang <strong>Primary Key</strong> ay isang column (or combination) na <em>unique</em> na nag-iidentify sa bawat row. Usually <code>id</code> na auto-increment.
+    </p>
+    <pre><code>CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,  ← eto ang primary key
+  name VARCHAR(100),
+  email VARCHAR(255)
+);</code></pre>
+
+    <div class="tip">
+      <strong>Auto-Increment</strong>
+      Ang <code>AUTO_INCREMENT</code> ay automatic nagbibigay ng number: 1, 2, 3, 4... Hindi mo na kailangang i-set manually.
+    </div>
+
+    <h3>Foreign Key</h3>
+    <p>
+      Ang <strong>Foreign Key</strong> ay isang column na nagli-link ng isang table sa primary key ng ibang table. Dito nagkakaroon ng <em>relationships</em> ang databases.
+    </p>
+
+    <pre><code>Table: posts
++----+----------------+---------+
+| id | title          | user_id |  ← foreign key (links to users.id)
++----+----------------+---------+
+| 1  | My First Post  | 1       |  ← si Juan ang may-ari
+| 2  | Hello World    | 2       |  ← si Maria ang may-ari
++----+----------------+---------+
+
+Table: users
++----+-------+
+| id | name  |
++----+-------+
+| 1  | Juan  |
+| 2  | Maria |
++----+-------+</code></pre>
+
+    <h2>SQL — Ang Language ng Databases</h2>
+    <p>Ang <strong>SQL</strong> (Structured Query Language) ang ginagamit para makipag-usap sa database. Parang "English" para sa databases.</p>
+
+    <h3>CREATE — Gumawa ng Table</h3>
+    <pre><code>CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  age INT DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+
+    <p><strong>Key constraints:</strong></p>
+    <ul>
+      <li><code>NOT NULL</code> — required, hindi pwedeng blanko</li>
+      <li><code>UNIQUE</code> — bawal mag-duplicate (like email)</li>
+      <li><code>DEFAULT value</code> — automatic value kung hindi naman provided</li>
+    </ul>
+
+    <h3>INSERT — Maglagay ng Data</h3>
+    <pre><code>INSERT INTO users (name, email, age)
+VALUES ('Juan', 'juan@example.com', 25);
+
+INSERT INTO users (name, email, age)
+VALUES ('Maria', 'maria@example.com', 30),
+       ('Pedro', 'pedro@example.com', 22);</code></pre>
+
+    <h3>SELECT — Kumuha ng Data</h3>
+    <pre><code>-- Kunin lahat
+SELECT * FROM users;
+
+-- Specific columns lang
+SELECT name, email FROM users;
+
+-- May condition
+SELECT * FROM users WHERE age >= 25;
+
+-- May sorting
+SELECT * FROM users ORDER BY name ASC;
+SELECT * FROM users ORDER BY age DESC;
+
+-- Limitahan ang results
+SELECT * FROM users LIMIT 10;
+
+-- Count
+SELECT COUNT(*) FROM users;
+SELECT COUNT(*) FROM users WHERE age > 20;</code></pre>
+
+    <h3>UPDATE — Baguhin ang Data</h3>
+    <pre><code>UPDATE users
+SET age = 26
+WHERE id = 1;
+
+-- Mag-update ng multiple columns
+UPDATE users
+SET name = 'Juan Dela Cruz', age = 26
+WHERE id = 1;</code></pre>
+
+    <div class="warning">
+      <strong>Warning!</strong>
+      Huwag kakalimutan ang <code>WHERE</code> sa UPDATE at DELETE! Kapag nakalimutan mo, <strong>lahat ng rows</strong> ang maaapektuhan!
+    </div>
+
+    <h3>DELETE — Burahin ang Data</h3>
+    <pre><code>DELETE FROM users WHERE id = 1;
+
+-- Burahin lahat (ingat!)
+DELETE FROM users;</code></pre>
+
+    <h3>WHERE — Mga Conditions</h3>
+    <pre><code>SELECT * FROM users WHERE age = 25;
+SELECT * FROM users WHERE age > 25;
+SELECT * FROM users WHERE age >= 25 AND age <= 35;
+SELECT * FROM users WHERE name LIKE '%an%';    -- may "an" sa name
+SELECT * FROM users WHERE email IS NOT NULL;
+SELECT * FROM users WHERE id IN (1, 3, 5);</code></pre>
+
+    <h2>Joins — Pagsasama ng Tables</h2>
+    <p>Ito ang <strong>pinakamahalaga</strong> sa relational databases — ang pagsama ng data mula sa dalawa o higit pang tables.</p>
+
+    <h3>INNER JOIN</h3>
+    <p>Kunin lang ang may <em>match</em> sa parehong tables:</p>
+    <pre><code>SELECT users.name, posts.title
+FROM users
+INNER JOIN posts ON users.id = posts.user_id;
+
++-------+----------------+
+| name  | title          |
++-------+----------------+
+| Juan  | My First Post  |
+| Maria | Hello World    |
++-------+----------------+
+-- Si Pedro wala pang post, hindi kasama</code></pre>
+
+    <h3>LEFT JOIN</h3>
+    <p>Kunin <em>lahat</em> mula sa left table, kahit walang match sa right:</p>
+    <pre><code>SELECT users.name, posts.title
+FROM users
+LEFT JOIN posts ON users.id = posts.user_id;
+
++-------+----------------+
+| name  | title          |
++-------+----------------+
+| Juan  | My First Post  |
+| Maria | Hello World    |
+| Pedro | NULL           | ← walang post si Pedro
++-------+----------------+</code></pre>
+
+    <h2>🛠️ Mini-Project: Gawin ang Database ng Blog</h2>
+
+    <div class="project">
+      <h3>Gawin Mo Ito sa phpMyAdmin!</h3>
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p>I-open ang <code>http://localhost/phpmyadmin</code></p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p>I-click ang <strong>New</strong> sa left sidebar at gumawa ng database na <code>blog_db</code></p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p>I-click ang <strong>SQL</strong> tab at i-paste ito:</p>
+          <pre><code>CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE posts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(200) NOT NULL,
+  body TEXT NOT NULL,
+  user_id INT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+INSERT INTO users (name, email) VALUES
+('Juan Dela Cruz', 'juan@example.com'),
+('Maria Santos', 'maria@example.com');
+
+INSERT INTO posts (title, body, user_id) VALUES
+('My First Blog Post', 'Hello everyone! This is my first post.', 1),
+('Learning SQL', 'SQL is fun and powerful!', 1),
+('Web Dev Tips', 'Here are some tips for beginners...', 2);</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <p>I-click ang <strong>Go</strong> — makikita mong may tables na!</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <p>I-try ang mga SQL queries na ito sa SQL tab:</p>
+          <pre><code>-- Lahat ng users at kanilang posts
+SELECT users.name, posts.title, posts.body
+FROM users
+INNER JOIN posts ON users.id = posts.user_id;
+
+-- Ilang posts ang bawat user?
+SELECT users.name, COUNT(posts.id) AS post_count
+FROM users
+LEFT JOIN posts ON users.id = posts.user_id
+GROUP BY users.id;</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <h2>✅ Quiz</h2>
+
+    <div class="quiz-item">
+      <p class="quiz-question">1. Aling SQL command ang ginagamit para kumuha ng data?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q1" value="a"> <code>GET</code></label>
+        <label class="quiz-option"><input type="radio" name="q1" value="b"> <code>SELECT</code></label>
+        <label class="quiz-option"><input type="radio" name="q1" value="c"> <code>FETCH</code></label>
+        <label class="quiz-option"><input type="radio" name="q1" value="d"> <code>FIND</code></label>
+      </div>
+      <div class="quiz-feedback" id="feedback1"></div>
+    </div>
+
+    <div class="quiz-item">
+      <p class="quiz-question">2. Ano ang tawag sa column na unique na nag-iidentify sa bawat row?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q2" value="a"> Foreign Key</label>
+        <label class="quiz-option"><input type="radio" name="q2" value="b"> Unique Key</label>
+        <label class="quiz-option"><input type="radio" name="q2" value="c"> Primary Key</label>
+        <label class="quiz-option"><input type="radio" name="q2" value="d"> Index</label>
+      </div>
+      <div class="quiz-feedback" id="feedback2"></div>
+    </div>
+
+    <div class="quiz-item">
+      <p class="quiz-question">3. Aling JOIN ang nagpapakita ng lahat ng records mula sa left table kahit walang match sa right?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q3" value="a"> INNER JOIN</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="b"> RIGHT JOIN</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="c"> OUTER JOIN</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="d"> LEFT JOIN</label>
+      </div>
+      <div class="quiz-feedback" id="feedback3"></div>
+    </div>
+
+    <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+    <h2>📖 Recommended Resources</h2>
+    <ul>
+      <li><a href="https://www.w3schools.com/sql/" target="_blank">W3Schools SQL Tutorial</a> — Beginner-friendly SQL lessons</li>
+      <li><a href="https://sqlzoo.net/" target="_blank">SQLZoo</a> — Interactive SQL practice, libre!</li>
+      <li><a href="https://www.mysqltutorial.org/" target="_blank">MySQL Tutorial</a> — Comprehensive MySQL tutorials</li>
+    </ul>
+
+    <h2>🎯 Lesson Summary</h2>
+    <ul>
+      <li>Ang <strong>database</strong> ay organized collection ng data (parang Excel pero mas powerful)</li>
+      <li><strong>Tables</strong> = lalagyan, <strong>Rows</strong> = records, <strong>Columns</strong> = attributes</li>
+      <li><strong>Primary Key</strong> = unique ID ng bawat row</li>
+      <li><strong>Foreign Key</strong> = nagli-link ng tables</li>
+      <li><strong>SQL</strong> commands: <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code></li>
+      <li><strong>JOINs</strong> = pagsama ng tables (INNER = may match lang, LEFT = lahat mula sa left)</li>
+      <li>Naka-install na ang <strong>XAMPP</strong> at gumawa ka na ng blog database! 🎉</li>
+    </ul>
+
+    <div class="info">
+      <strong>Next Lesson:</strong> Lesson 0006 — Laravel Setup! Gagamitin natin ang MySQL database na ginawa mo at gagawa tayo ng actual web app. Excited ka na ba? 🚀
+    </div>
+
+    <div class="lesson-nav">
+      <a href="0004-git-and-github.html" class="nav-link nav-prev">← Previous: Git & GitHub</a>
+      <a href="0006-laravel-setup-routing-controllers.html" class="nav-link nav-next">Next: Laravel Setup →</a>
+    </div>
+
+  </div>
+
+  <script>
+    function checkQuiz() {
+      const answers = { q1: 'b', q2: 'c', q3: 'd' };
+      for (let [name, correct] of Object.entries(answers)) {
+        const selected = document.querySelector(`input[name="${name}"]:checked`);
+        const feedback = document.getElementById(`feedback${name.slice(1)}`);
+        if (!selected) {
+          feedback.textContent = 'Please select an answer!';
+          feedback.className = 'quiz-feedback incorrect';
+          continue;
+        }
+        if (selected.value === correct) {
+          feedback.textContent = '✅ Tama! Magaling!';
+          feedback.className = 'quiz-feedback correct';
+        } else {
+          let hints = { q1: 'Hint: SELECT ang tamang SQL command para kumuha ng data.', q2: 'Hint: Primary Key ang unique identifier sa bawat row.', q3: 'Hint: LEFT JOIN ang nagpapakita ng lahat ng records mula sa left table.' };
+          feedback.textContent = `❌ Hindi tama. ${hints[name]}`;
+          feedback.className = 'quiz-feedback incorrect';
+        }
+      }
+    }
+  </script>
+</main></div><script src="../assets/lessons-data.js"></script><script src="../assets/lesson-nav.js"></script><script src="../assets/sidebar.js"></script></body>
+</html>

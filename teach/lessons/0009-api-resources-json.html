@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0009: API Resources & JSON Responses</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="lesson-layout">
+  <aside class="lesson-sidebar" id="lesson-sidebar"></aside>
+  <main class="lesson-main">
+    <div class="lesson-container">
+
+      <h1>Lesson 0009: API Resources & JSON Responses</h1>
+      <p><em>I-format at i-standardize ang iyong API responses gamit ang Laravel API Resources.</em></p>
+
+      <div class="info">
+        <strong>Lesson Goal</strong>
+        Matutunan kung paano gumamit ng API Resources para mag-transform ng Eloquent models sa structured JSON responses, magdagdag ng pagination, at mag-handle ng errors nang maayos.
+      </div>
+
+      <!-- ======== PART 1: API RESOURCES ======== -->
+      <h2>Part 1: Introduction to API Resources</h2>
+
+      <p>Sa ngayon, ang ating API ay nagre-return ng raw Eloquent models bilang JSON. Problema: kasama ang lahat ng columns — pati na ang <code>created_at</code> at <code>updated_at</code> sa default format. Hindi ito maganda para sa isang propesyonal na API.</p>
+
+      <p>Ang <strong>API Resources</strong> ay isang transformation layer na nagbibigay-daan sa iyo na i-control kung ano ang lalabas sa iyong JSON response.</p>
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p><strong>Create a Post Resource:</strong></p>
+          <pre><code>php artisan make:resource PostResource</code></pre>
+          <p>May makikita kang bagong file sa <code>app/Http/Resources/PostResource.php</code>.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p><strong>Edit PostResource:</strong></p>
+          <pre><code>&lt;?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class PostResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id'         =&gt; $this-&gt;id,
+            'title'      =&gt; $this-&gt;title,
+            'content'    =&gt; $this-&gt;content,
+            'author'     =&gt; new UserResource($this-&gt;whenLoaded('user')),
+            'comments'   =&gt; CommentResource::collection($this-&gt;whenLoaded('comments')),
+            'created_at' =&gt; $this-&gt;created_at-&gt;diffForHumans(),
+            'updated_at' =&gt; $this-&gt;updated_at-&gt;diffForHumans(),
+        ];
+    }
+}</code></pre>
+          <p>Ang <code>$this</code> sa loob ng resource ay tumutukoy sa <strong>model instance</strong>. Ang <code>$this-&gt;whenLoaded()</code> ay magre-return lang ng relationship data kung ito ay na-load (eager loaded).</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p><strong>Create UserResource:</strong></p>
+          <pre><code>php artisan make:resource UserResource</code></pre>
+
+          <pre><code>class UserResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id'   =&gt; $this-&gt;id,
+            'name' =&gt; $this-&gt;name,
+            'email' =&gt; $this-&gt;email,
+        ];
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <p><strong>Create CommentResource:</strong></p>
+          <pre><code>php artisan make:resource CommentResource</code></pre>
+
+          <pre><code>class CommentResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id'     =&gt; $this-&gt;id,
+            'author' =&gt; $this-&gt;author,
+            'body'   =&gt; $this-&gt;body,
+            'posted' =&gt; $this-&gt;created_at-&gt;diffForHumans(),
+        ];
+    }
+}</code></pre>
+        </div>
+      </div>
+
+      <h3>Resource Collections</h3>
+
+      <p>Para sa listahan ng posts, gumawa tayo ng <strong>PostCollection</strong>:</p>
+
+      <pre><code>php artisan make:resource PostCollection</code></pre>
+
+      <pre><code>&lt;?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+
+class PostCollection extends ResourceCollection
+{
+    public $collects = PostResource::class;
+
+    public function toArray(Request $request): array
+    {
+        return [
+            'data' =&gt; $this-&gt;collection,
+            'meta' =&gt; [
+                'total' =&gt; $this-&gt;total(),
+                'count' =&gt; $this-&gt;count(),
+                'per_page' =&gt; $this-&gt;perPage(),
+                'current_page' =&gt; $this-&gt;currentPage(),
+                'last_page' =&gt; $this-&gt;lastPage(),
+            ],
+        ];
+    }
+}</code></pre>
+
+      <div class="tip">
+        <strong>Resource vs Collection</strong>
+        <ul>
+          <li><code>PostResource</code> — ginagamit para sa <strong>iisang</strong> Post model</li>
+          <li><code>PostCollection</code> — ginagamit para sa <strong>listahan</strong> ng posts na may pagination</li>
+          <li>Alternative: Pwedeng direkta kang gumamit ng <code>PostResource::collection($posts)</code> para sa collections na walang meta</li>
+        </ul>
+      </div>
+
+      <!-- ======== PART 2: USING RESOURCES IN CONTROLLERS ======== -->
+      <h2>Part 2: Using Resources sa Routes</h2>
+
+      <p>Ngayon, i-update natin ang <code>routes/api.php</code> para gamitin ang resources:</p>
+
+      <pre><code>use App\Http\Resources\PostResource;
+use App\Http\Resources\PostCollection;
+use App\Models\Post;
+
+// Public routes
+Route::get('/posts', function () {
+    $posts = Post::with(['user', 'comments'])-&gt;paginate(10);
+    return new PostCollection($posts);
+});
+
+Route::get('/posts/{post}', function (Post $post) {
+    $post-&gt;load(['user', 'comments']);
+    return new PostResource($post);
+});
+
+// Protected routes (kailangan ng auth token)
+Route::middleware('auth:sanctum')-&gt;group(function () {
+    Route::post('/posts', function (Request $request) {
+        $validated = $request-&gt;validate([
+            'title'   =&gt; 'required|string|max:255',
+            'content' =&gt; 'required|string',
+        ]);
+
+        $post = $request-&gt;user()-&gt;posts()-&gt;create($validated);
+
+        return new PostResource($post);
+    });
+
+    Route::put('/posts/{post}', function (Request $request, Post $post) {
+        $post-&gt;update($request-&gt;validate([
+            'title'   =&gt; 'sometimes|string|max:255',
+            'content' =&gt; 'sometimes|string',
+        ]));
+
+        return new PostResource($post);
+    });
+
+    Route::delete('/posts/{post}', function (Post $post) {
+        $post-&gt;delete();
+        return response()-&gt;json(['message' =&gt; 'Post deleted successfully']);
+    });
+});</code></pre>
+
+      <h3>Sample JSON Response</h3>
+
+      <p>Ngayon, ang iyong API response ay magiging ganito:</p>
+
+      <pre><code>{
+  "data": [
+    {
+      "id": 1,
+      "title": "My First Post",
+      "content": "Hello World!",
+      "author": {
+        "id": 1,
+        "name": "Juan",
+        "email": "juan@example.com"
+      },
+      "comments": [
+        {
+          "id": 1,
+          "author": "Maria",
+          "body": "Nice post!",
+          "posted": "2 hours ago"
+        }
+      ],
+      "created_at": "3 hours ago",
+      "updated_at": "3 hours ago"
+    }
+  ],
+  "meta": {
+    "total": 1,
+    "count": 1,
+    "per_page": 10,
+    "current_page": 1,
+    "last_page": 1
+  }
+}</code></pre>
+
+      <div class="tip">
+        <strong>Bakit maganda ang API Resources?</strong>
+        <ul>
+          <li><strong>Consistency</strong> — lahat ng endpoints ay may pare-parehong JSON structure</li>
+          <li><strong>Control</strong> — ikaw ang magde-decide kung anong data ang ilalabas</li>
+          <li><strong>Transformations</strong> — pwedeng mag-format ng dates, i-hide ang sensitive data, at magdagdag ng computed fields</li>
+          <li><strong>Conditional data</strong> — gamit ang <code>whenLoaded()</code>, <code>when()</code>, at iba pa</li>
+        </ul>
+      </div>
+
+      <!-- ======== PART 3: PAGINATION ======== -->
+      <h2>Part 3: Pagination at Response Structure</h2>
+
+      <p>Ang <code>paginate(10)</code> ay automatic na nagdi-divide ng results sa pages. Ang <code>PostCollection</code> ay naglalagay ng <code>meta</code> object na may pagination info. Makukuha ng frontend ang mga ito para mag-display ng page navigation.</p>
+
+      <p>Ito ang standard na ginagamit ng karamihan sa modernong APIs (JSON:API inspired).</p>
+
+      <!-- ======== QUIZ ======== -->
+      <h2>Quick Quiz</h2>
+
+      <div class="quiz-item">
+        <div class="quiz-question">1. Anong command ang ginagamit para gumawa ng API Resource?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q1" value="a"> <code>php artisan make:api PostResource</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="b"> <code>php artisan make:resource PostResource</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="c"> <code>php artisan make:model PostResource</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback1"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">2. Ano ang ginagawa ng <code>$this->whenLoaded('comments')</code> sa isang Resource?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q2" value="a"> Niloload nito ang comments mula sa database</label>
+          <label class="quiz-option"><input type="radio" name="q2" value="b"> Iri-return lang nito ang comments kung na-eager-load na sila</label>
+          <label class="quiz-option"><input type="radio" name="q2" value="c"> Ginagawa nitong required na may comments ang post</label>
+        </div>
+        <div class="quiz-feedback" id="feedback2"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">3. Aling method ang ginagamit para mag-paginate ng Eloquent query?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q3" value="a"> <code>Post::paginate(10)</code></label>
+          <label class="quiz-option"><input type="radio" name="q3" value="b"> <code>Post::page(10)</code></label>
+          <label class="quiz-option"><input type="radio" name="q3" value="c"> <code>Post::limit(10)</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback3"></div>
+      </div>
+
+      <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+      <!-- ======== PROJECT ======== -->
+      <div class="project">
+        <h3>Mini-Project: Transform Blog API with Resources</h3>
+        <p>Gawing propesyonal ang iyong Blog API:</p>
+        <ul>
+          <li>Gumawa ng <code>PostResource</code>, <code>UserResource</code>, at <code>CommentResource</code></li>
+          <li>Gumawa ng <code>PostCollection</code> na may pagination meta</li>
+          <li>I-update ang routes para gamitin ang mga resources</li>
+          <li>I-test ang output — dapat consistent ang JSON structure</li>
+          <li>Subukan ang pagination: <code>GET /api/posts?page=1</code></li>
+        </ul>
+      </div>
+
+      <!-- ======== SUMMARY ======== -->
+      <h2>Summary</h2>
+      <ul>
+        <li>Ang <strong>API Resources</strong> ay nagti-transform ng Eloquent models sa structured JSON</li>
+        <li>Gamitin ang <code>php artisan make:resource</code> para gumawa ng resource class</li>
+        <li>Ang <code>whenLoaded()</code> ay pumipigil sa N+1 query problems sa resources</li>
+        <li>Ang <code>ResourceCollection</code> ay ginagamit para sa mga listahan na may meta data</li>
+        <li>Ang <code>paginate()</code> method ay automatic na nagha-handle ng pagination</li>
+      </ul>
+
+      <div class="info">
+        <strong>Next Steps</strong>
+        Sa susunod na lesson (0010), matututunan mo ang <strong>File Uploads & Storage</strong> — kung paano mag-upload at mag-serve ng files sa Laravel!
+      </div>
+
+      <div class="lesson-nav"></div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../assets/lessons-data.js"></script>
+<script src="../assets/lesson-nav.js"></script>
+<script src="../assets/sidebar.js"></script>
+<script>
+  function checkQuiz() {
+    var answers = { q1: 'b', q2: 'b', q3: 'a' };
+    for (var key in answers) {
+      var sel = document.querySelector('input[name="' + key + '"]:checked');
+      var fb = document.getElementById('feedback' + key.slice(1));
+      if (!sel) {
+        fb.textContent = 'Please select an answer!';
+        fb.className = 'quiz-feedback incorrect';
+        continue;
+      }
+      if (sel.value === answers[key]) {
+        fb.textContent = '\u2705 Tama! ' + (key === 'q1' ? 'Ang tamang command ay make:resource.' : key === 'q2' ? 'Ang whenLoaded() ay conditional — lalabas lang ang data kung na-load na.' : 'Ang paginate() ang tamang method para sa paginated results.');
+        fb.className = 'quiz-feedback correct';
+      } else {
+        var hint = key === 'q1' ? 'Hint: Ang keyword ay "resource" — ginagamit ito para sa API transformation.' : key === 'q2' ? 'Hint: Hindi ito nagla-load ng data — ito ay nag-conditional lang.' : 'Hint: Hindi limit() o page() ang gamit — ang Eloquent ay may built-in method para dito.';
+        fb.textContent = '\u274C Hindi tama. ' + hint;
+        fb.className = 'quiz-feedback incorrect';
+      }
+    }
+  }
+</script>
+</body>
+</html>

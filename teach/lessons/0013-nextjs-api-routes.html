@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0013: Next.js API Routes</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="lesson-layout">
+  <aside class="lesson-sidebar" id="lesson-sidebar"></aside>
+  <main class="lesson-main">
+    <div class="lesson-container">
+
+      <h1>Lesson 0013: Next.js API Routes</h1>
+      <p><em>Gumawa ng backend endpoints sa loob mismo ng iyong Next.js app — perfect para sa mga form submissions at authentication.</em></p>
+
+      <div class="info">
+        <strong>Lesson Goal</strong>
+        Matutunan kung paano gumawa ng API routes sa Next.js, mag-handle ng form submissions, gumamit ng middleware, at mag-setup ng environment variables para sa secure na API calls.
+      </div>
+
+      <!-- ======== PART 1: WHAT ARE API ROUTES ======== -->
+      <h2>Part 1: Introduction to API Routes</h2>
+
+      <p>Ang <strong>API Routes</strong> ay nagbibigay-daan sa iyo na gumawa ng serverless API endpoints sa loob ng iyong Next.js project. Ilagay ang mga ito sa <code>pages/api/</code> directory — same file-based routing pattern gamit.</p>
+
+      <table>
+        <tr><th>File</th><th>URL</th></tr>
+        <tr><td><code>pages/api/hello.js</code></td><td><code>/api/hello</code></td></tr>
+        <tr><td><code>pages/api/contact.js</code></td><td><code>/api/contact</code></td></tr>
+        <tr><td><code>pages/api/posts/[id].js</code></td><td><code>/api/posts/1</code></td></tr>
+      </table>
+
+      <div class="tip">
+        <strong>Note</strong>
+        Ang API Routes ay <strong>hindi</strong> kapalit ng Laravel backend. Gamitin ang mga ito para sa:
+        <ul>
+          <li>Form submissions (contact form)</li>
+          <li>Authentication (NextAuth.js)</li>
+          <li>Proxy — mag-fetch mula sa external API (para maiwasan ang CORS issues)</li>
+          <li>Server-side operations na kailangan ng secret keys</li>
+        </ul>
+      </div>
+
+      <!-- ======== PART 2: BASIC API ROUTE ======== -->
+      <h2>Part 2: Creating API Routes</h2>
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p><strong>Create a basic API route:</strong></p>
+          <pre><code>// pages/api/hello.js
+export default function handler(req, res) {
+  res.status(200).json({ message: 'Hello from Next.js!' });
+}</code></pre>
+          <p>I-test: <code>http://localhost:3000/api/hello</code> → <code>{"message":"Hello from Next.js!"}</code></p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p><strong>Handle different HTTP methods:</strong></p>
+          <pre><code>// pages/api/contact.js
+export default function handler(req, res) {
+  if (req.method === 'POST') {
+    // Process the form submission
+    const { name, email, message } = req.body;
+
+    // Validate
+    if (!name || !email || !message) {
+      return res.status(400).json({ error: 'All fields are required.' });
+    }
+
+    // Send email or save to database (dummy example)
+    console.log('Contact form:', { name, email, message });
+
+    return res.status(200).json({ message: 'Message sent successfully!' });
+  }
+
+  // Handle other methods
+  res.setHeader('Allow', ['POST']);
+  res.status(405).json({ error: `Method ${req.method} not allowed` });
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p><strong>Connect form to API route:</strong></p>
+          <pre><code>// components/ContactForm.js
+import { useState } from 'react';
+
+export default function ContactForm() {
+  const [status, setStatus] = useState('idle');
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setStatus('loading');
+
+    const form = new FormData(e.target);
+    const data = Object.fromEntries(form);
+
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (res.ok) {
+      setStatus('success');
+      e.target.reset();
+    } else {
+      setStatus('error');
+    }
+  }
+
+  return (
+    &lt;form onSubmit={handleSubmit}&gt;
+      &lt;input name="name" placeholder="Name" required /&gt;
+      &lt;input name="email" type="email" placeholder="Email" required /&gt;
+      &lt;textarea name="message" placeholder="Message" required&gt;&lt;/textarea&gt;
+      &lt;button type="submit" disabled={status === 'loading'}&gt;
+        {status === 'loading' ? 'Sending...' : 'Send'}
+      &lt;/button&gt;
+      {status === 'success' && &lt;p&gt;Message sent!&lt;/p&gt;}
+      {status === 'error' && &lt;p&gt;Something went wrong.&lt;/p&gt;}
+    &lt;/form&gt;
+  );
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- ======== PART 3: DYNAMIC API ROUTES ======== -->
+      <h2>Part 3: Dynamic API Routes</h2>
+
+      <p>Pwedeng gumamit ng dynamic segments sa API routes:</p>
+
+      <pre><code>// pages/api/posts/[id].js
+export default function handler(req, res) {
+  const { id } = req.query;
+
+  switch (req.method) {
+    case 'GET':
+      // Kunin ang post mula sa Laravel API
+      return fetch(`http://localhost:8000/api/posts/${id}`)
+        .then(r =&gt; r.json())
+        .then(data =&gt; res.status(200).json(data))
+        .catch(() =&gt; res.status(502).json({ error: 'API unavailable' }));
+
+    case 'DELETE':
+      return fetch(`http://localhost:8000/api/posts/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: req.headers.authorization },
+      })
+        .then(r =&gt; res.status(200).json({ message: 'Deleted' }))
+        .catch(() =&gt; res.status(502).json({ error: 'API unavailable' }));
+
+    default:
+      res.setHeader('Allow', ['GET', 'DELETE']);
+      res.status(405).json({ error: `Method ${req.method} not allowed` });
+  }
+}</code></pre>
+
+      <div class="warning">
+        <strong>Security Reminder</strong>
+        Huwag mag-hardcode ng API keys sa code. Gamitin ang <strong>environment variables</strong> (next section).
+      </div>
+
+      <!-- ======== PART 4: ENVIRONMENT VARIABLES ======== -->
+      <h2>Part 4: Environment Variables</h2>
+
+      <p>Gumawa ng <code>.env.local</code> file sa root ng iyong Next.js project:</p>
+
+      <pre><code># .env.local
+NEXT_PUBLIC_API_URL=http://localhost:8000/api
+API_TOKEN=your-secret-token-here</code></pre>
+
+      <div class="tip">
+        <strong>Prefix Convention</strong>
+        <ul>
+          <li><code>NEXT_PUBLIC_</code> — exposed sa browser. Pwedeng gamitin sa client-side code.</li>
+          <li>Walang prefix — server-side lang. Hindi accessible sa browser.</li>
+        </ul>
+        Halimbawa: ang <code>NEXT_PUBLIC_API_URL</code> ay pwedeng gamitin sa <code>useSWR</code> sa browser. Ang <code>API_TOKEN</code> ay sa <code>getStaticProps</code> o API routes lamang.
+      </div>
+
+      <p>Gamitin ang environment variables sa API route:</p>
+
+      <pre><code>// pages/api/posts/index.js
+export default async function handler(req, res) {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+  try {
+    const response = await fetch(`${apiUrl}/posts`, {
+      headers: {
+        Authorization: `Bearer ${process.env.API_TOKEN}`,
+      },
+    });
+    const data = await response.json();
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(502).json({ error: 'Failed to fetch posts' });
+  }
+}</code></pre>
+
+      <!-- ======== PART 5: MIDDLEWARE ======== -->
+      <h2>Part 5: Next.js Middleware</h2>
+
+      <p>Ang <strong>Middleware</strong> ay nagpapahintulot sa iyo na magpatakbo ng code bago ang isang request ay ma-complete — perfect para sa authentication, redirects, at rate limiting.</p>
+
+      <p>Gumawa ng <code>middleware.js</code> sa root ng iyong project:</p>
+
+      <pre><code>// middleware.js
+import { NextResponse } from 'next/server';
+
+export function middleware(request) {
+  const token = request.cookies.get('token');
+
+  // Protektahan ang /dashboard routes
+  if (request.nextUrl.pathname.startsWith('/dashboard')) {
+    if (!token) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+  }
+
+  return NextResponse.next();
+}
+
+// Specify which routes ang maaapektuhan
+export const config = {
+  matcher: ['/dashboard/:path*', '/api/protected/:path*'],
+};</code></pre>
+
+      <!-- ======== QUIZ ======== -->
+      <h2>Quick Quiz</h2>
+
+      <div class="quiz-item">
+        <div class="quiz-question">1. Saan inilalagay ang API Routes sa Next.js?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q1" value="a"> <code>api/</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="b"> <code>pages/api/</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="c"> <code>routes/api/</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback1"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">2. Ano ang tamang prefix para sa environment variable na gagamitin sa browser?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q2" value="a"> <code>NEXT_PUBLIC_</code></label>
+          <label class="quiz-option"><input type="radio" name="q2" value="b"> <code>PUBLIC_</code></label>
+          <label class="quiz-option"><input type="radio" name="q2" value="c"> <code>CLIENT_</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback2"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">3. Aling file ang ginagamit para sa global middleware sa Next.js?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q3" value="a"> <code>middleware.js</code> sa root</label>
+          <label class="quiz-option"><input type="radio" name="q3" value="b"> <code>pages/_middleware.js</code></label>
+          <label class="quiz-option"><input type="radio" name="q3" value="c"> <code>next.config.js</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback3"></div>
+      </div>
+
+      <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+      <!-- ======== PROJECT ======== -->
+      <div class="project">
+        <h3>Mini-Project: Contact Form with API Route</h3>
+        <p>Gumawa ng contact form na nagse-send ng data sa pamamagitan ng Next.js API route:</p>
+        <ul>
+          <li>Gumawa ng <code>pages/api/contact.js</code> na tumatanggap ng POST requests</li>
+          <li>Magdagdag ng validation — dapat may name, email, at message</li>
+          <li>Gumawa ng ContactForm component sa React</li>
+          <li>Gamitin ang <code>fetch('/api/contact')</code> para i-submit ang form</li>
+          <li>Magpakita ng loading, success, at error states</li>
+          <li>Bonus: Magdagdag ng API route na nagfe-fetch ng posts mula sa Laravel (proxy pattern)</li>
+        </ul>
+      </div>
+
+      <!-- ======== SUMMARY ======== -->
+      <h2>Summary</h2>
+      <ul>
+        <li>Ang API Routes ay nasa <code>pages/api/</code> — file-based routing rin</li>
+        <li>Gamitin ang <code>req.method</code> para i-handle ang iba't ibang HTTP methods</li>
+        <li>Ang environment variables na may <code>NEXT_PUBLIC_</code> prefix ay exposed sa browser</li>
+        <li>Ang <code>middleware.js</code> ay ginagamit para sa authentication at redirects</li>
+        <li>Ang API Routes ay serverless — hindi kailangan ng separate backend server</li>
+      </ul>
+
+      <div class="info">
+        <strong>Next Steps</strong>
+        Sa susunod at huling lesson ng Phase 3 (0014), matututunan mo kung paano i-deploy ang iyong Next.js app sa <strong>Vercel</strong> — ang pinakamadaling paraan para ilive ang iyong portfolio!
+      </div>
+
+      <div class="lesson-nav"></div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../assets/lessons-data.js"></script>
+<script src="../assets/lesson-nav.js"></script>
+<script src="../assets/sidebar.js"></script>
+<script>
+  function checkQuiz() {
+    var answers = { q1: 'b', q2: 'a', q3: 'a' };
+    for (var key in answers) {
+      var sel = document.querySelector('input[name="' + key + '"]:checked');
+      var fb = document.getElementById('feedback' + key.slice(1));
+      if (!sel) { fb.textContent = 'Please select an answer!'; fb.className = 'quiz-feedback incorrect'; continue; }
+      if (sel.value === answers[key]) {
+        fb.textContent = '\u2705 Tama! ' + (key === 'q1' ? 'Ang API Routes ay nasa pages/api/ directory.' : key === 'q2' ? 'Ang NEXT_PUBLIC_ ang prefix para sa browser-accessible env vars.' : 'Ang middleware.js sa root ang gamit para sa global middleware.');
+        fb.className = 'quiz-feedback correct';
+      } else {
+        fb.textContent = '\u274C Hindi tama. ' + (key === 'q1' ? 'Hint: Same pattern sa pages — nasa loob ng pages directory.' : key === 'q2' ? 'Hint: Nagsisimula sa "NEXT" dahil ito ay Next.js convention.' : 'Hint: Hindi ito nasa pages folder o config file.');
+        fb.className = 'quiz-feedback incorrect';
+      }
+    }
+  }
+</script>
+</body>
+</html>

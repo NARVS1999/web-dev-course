@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0016: React Native Navigation</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="lesson-layout">
+  <aside class="lesson-sidebar" id="lesson-sidebar"></aside>
+  <main class="lesson-main">
+    <div class="lesson-container">
+
+      <h1>Lesson 0016: React Native Navigation</h1>
+      <p><em>Gawing multi-screen app ang iyong React Native project gamit ang React Navigation.</em></p>
+
+      <div class="info">
+        <strong>Lesson Goal</strong>
+        Matutunan ang React Navigation — Stack Navigator para sa screen-to-screen navigation at Bottom Tab Navigator para sa tab-based layout. Makagawa ng multi-screen app na may Home, Profile, at Settings screens.
+      </div>
+
+      <h2>Part 1: Ano ang React Navigation?</h2>
+      <p>Sa web, gumagamit tayo ng URL at browser history para mag-navigate. Sa mobile app, walang URL bar — kailangan natin ng <strong>navigation library</strong> para mag-handle ng screen transitions.</p>
+
+      <p>Ang <strong>React Navigation</strong> ang pinakasikat na navigation library para sa React Native. Libre at open-source.</p>
+
+      <h2>Part 2: Installation</h2>
+      <p>I-install ang mga dependencies sa iyong Expo project:</p>
+
+      <pre><code>npx expo install @react-navigation/native
+npx expo install @react-navigation/native-stack
+npx expo install @react-navigation/bottom-tabs
+npx expo install react-native-screens react-native-safe-area-context</code></pre>
+
+      <h2>Part 3: Stack Navigator</h2>
+      <p>Ang <strong>Stack Navigator</strong> ay parang isang stack ng cards — ang bagong screen ay pumapatong sa itaas ng nauna. Pwedeng mag-back gamit ang back button (o swipe sa iOS).</p>
+
+      <pre><code>// App.js
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import HomeScreen from './screens/HomeScreen';
+import ProfileScreen from './screens/ProfileScreen';
+
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  return (
+    &lt;NavigationContainer&gt;
+      &lt;Stack.Navigator initialRouteName="Home"&gt;
+        &lt;Stack.Screen name="Home" component={HomeScreen} /&gt;
+        &lt;Stack.Screen name="Profile" component={ProfileScreen} /&gt;
+      &lt;/Stack.Navigator&gt;
+    &lt;/NavigationContainer&gt;
+  );
+}</code></pre>
+
+      <pre><code>// screens/HomeScreen.js
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
+export default function HomeScreen({ navigation }) {
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;Text style={styles.title}&gt;Home Screen&lt;/Text&gt;
+      &lt;TouchableOpacity
+        style={styles.button}
+        onPress={() =&gt; navigation.navigate('Profile', { userId: 1 })}
+      &gt;
+        &lt;Text style={styles.buttonText}&gt;Go to Profile&lt;/Text&gt;
+      &lt;/TouchableOpacity&gt;
+    &lt;/View&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+  button: {
+    backgroundColor: '#2563eb',
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  buttonText: { color: '#fff', fontSize: 16 },
+});</code></pre>
+
+      <pre><code>// screens/ProfileScreen.js
+import { View, Text, StyleSheet } from 'react-native';
+
+export default function ProfileScreen({ route }) {
+  const { userId } = route.params;
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;Text style={styles.title}&gt;Profile&lt;/Text&gt;
+      &lt;Text&gt;User ID: {userId}&lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}</code></pre>
+
+      <div class="tip">
+        <strong>navigation at route props</strong>
+        Ang bawat screen component ay tumatanggap ng dalawang importanteng props: <code>navigation</code> (para mag-navigate) at <code>route</code> (para sa params). Hindi mo kailangan ng <code>useNavigation()</code> hook kung ang component ay directly registered sa Stack.
+      </div>
+
+      <h2>Part 4: Bottom Tab Navigator</h2>
+      <p>Ang <strong>Bottom Tab Navigator</strong> ay nagbibigay ng tabs sa ilalim ng screen — perfect para sa main sections ng app (Home, Search, Profile, atbp.).</p>
+
+      <pre><code>// App.js — may tabs
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import HomeScreen from './screens/HomeScreen';
+import SearchScreen from './screens/SearchScreen';
+import ProfileScreen from './screens/ProfileScreen';
+
+const Tab = createBottomTabNavigator();
+
+export default function App() {
+  return (
+    &lt;NavigationContainer&gt;
+      &lt;Tab.Navigator&gt;
+        &lt;Tab.Screen name="Home" component={HomeScreen} /&gt;
+        &lt;Tab.Screen name="Search" component={SearchScreen} /&gt;
+        &lt;Tab.Screen name="Profile" component={ProfileScreen} /&gt;
+      &lt;/Tab.Navigator&gt;
+    &lt;/NavigationContainer&gt;
+  );
+}</code></pre>
+
+      <div class="tip">
+        <strong>Combining Stack and Tabs</strong>
+        Pwede ring pagsamahin ang Stack at Tabs — halimbawa, ang Home tab ay may sariling Stack Navigator na may HomeScreen at ArticleScreen. Ito ang common pattern sa real apps.
+      </div>
+
+      <h2>Part 5: Navigation Patterns</h2>
+
+      <h3>Passing Params</h3>
+      <p>Magpadala ng data sa pagitan ng screens:</p>
+      <pre><code>// From screen 1
+navigation.navigate('Details', { itemId: 42, title: 'My Item' });
+
+// Sa screen 2
+const { itemId, title } = route.params;</code></pre>
+
+      <h3>Going Back</h3>
+      <pre><code>navigation.goBack();</code></pre>
+
+      <h3>Reset Navigation State</h3>
+      <pre><code>navigation.reset({
+  index: 0,
+  routes: [{ name: 'Home' }],
+});</code></pre>
+
+      <!-- ======== QUIZ ======== -->
+      <h2>Quick Quiz</h2>
+
+      <div class="quiz-item">
+        <div class="quiz-question">1. Anong library ang ginagamit para sa navigation sa React Native?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q1" value="a"> React Router Native</label>
+          <label class="quiz-option"><input type="radio" name="q1" value="b"> React Navigation</label>
+          <label class="quiz-option"><input type="radio" name="q1" value="c"> Native Router</label>
+        </div>
+        <div class="quiz-feedback" id="feedback1"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">2. Ano ang prop na ginagamit para ma-access ang params ng screen?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q2" value="a"> <code>navigation.params</code></label>
+          <label class="quiz-option"><input type="radio" name="q2" value="b"> <code>route.params</code></label>
+          <label class="quiz-option"><input type="radio" name="q2" value="c"> <code>screen.params</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback2"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">3. Aling Navigator ang nagbibigay ng tabs sa ilalim ng screen?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q3" value="a"> Stack Navigator</label>
+          <label class="quiz-option"><input type="radio" name="q3" value="b"> Bottom Tab Navigator</label>
+          <label class="quiz-option"><input type="radio" name="q3" value="c"> Drawer Navigator</label>
+        </div>
+        <div class="quiz-feedback" id="feedback3"></div>
+      </div>
+
+      <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+      <!-- ======== PROJECT ======== -->
+      <div class="project">
+        <h3>Mini-Project: Multi-Screen App</h3>
+        <p>Gumawa ng app na may sumusunod:</p>
+        <ul>
+          <li>Bottom Tab Navigator na may 3 tabs: Home, Blog, About</li>
+          <li>Home tab: may greeting at button na "View Blog Posts" → nag-navigate sa Blog screen</li>
+          <li>Blog tab: listahan ng blog posts (hardcoded muna)</li>
+          <li>About tab: impormasyon tungkol sa developer (ikaw)</li>
+          <li>Gamitin ang <code>navigation.navigate()</code> at <code>route.params</code></li>
+        </ul>
+      </div>
+
+      <!-- ======== SUMMARY ======== -->
+      <h2>Summary</h2>
+      <ul>
+        <li>Ang React Navigation ang standard na navigation library para sa React Native</li>
+        <li>Stack Navigator = screen-by-screen navigation (parang cards na naka-stack)</li>
+        <li>Bottom Tab Navigator = tabs sa ilalim para sa main sections</li>
+        <li>Ang screen components ay may <code>navigation</code> at <code>route</code> props</li>
+        <li>Gamitin ang <code>navigation.navigate('ScreenName', { params })</code> para magpunta sa ibang screen</li>
+      </ul>
+
+      <div class="info">
+        <strong>Next Steps</strong>
+        Sa susunod na lesson (0017), matututunan mo ang <strong>API Integration</strong> — kung paano ikonek ang iyong React Native app sa iyong Laravel API at mag-save ng data locally gamit ang AsyncStorage!
+      </div>
+
+      <div class="lesson-nav"></div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../assets/lessons-data.js"></script>
+<script src="../assets/lesson-nav.js"></script>
+<script src="../assets/sidebar.js"></script>
+<script>
+  function checkQuiz() {
+    var answers = { q1: 'b', q2: 'b', q3: 'b' };
+    for (var key in answers) {
+      var sel = document.querySelector('input[name="' + key + '"]:checked');
+      var fb = document.getElementById('feedback' + key.slice(1));
+      if (!sel) { fb.textContent = 'Please select an answer!'; fb.className = 'quiz-feedback incorrect'; continue; }
+      if (sel.value === answers[key]) {
+        fb.textContent = '\u2705 Tama! ' + (key === 'q1' ? 'React Navigation ang standard navigation library for RN.' : key === 'q2' ? 'Ang route.params ang naglalaman ng passed parameters.' : 'Ang Bottom Tab Navigator ang naglalagay ng tabs sa ilalim.');
+        fb.className = 'quiz-feedback correct';
+      } else {
+        fb.textContent = '\u274C Hindi tama. ' + (key === 'q1' ? 'Hint: Ito ay galing sa React Navigation team.' : key === 'q2' ? 'Hint: Nasa route object ito, hindi sa navigation.' : 'Hint: Sa ilalim ng screen ito lumalabas.');
+        fb.className = 'quiz-feedback incorrect';
+      }
+    }
+  }
+</script>
+</body>
+</html>

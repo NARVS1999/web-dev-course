@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0014: Next.js Deployment</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="lesson-layout">
+  <aside class="lesson-sidebar" id="lesson-sidebar"></aside>
+  <main class="lesson-main">
+    <div class="lesson-container">
+
+      <h1>Lesson 0014: Next.js Deployment</h1>
+      <p><em>I-deploy ang iyong Next.js portfolio sa Vercel — libre at walang sakit ng ulo.</em></p>
+
+      <div class="info">
+        <strong>Lesson Goal</strong>
+        Matutunan kung paano i-deploy ang Next.js app sa Vercel, mag-setup ng environment variables, magdagdag ng custom domain, at i-connect ang frontend sa iyong Laravel backend.
+      </div>
+
+      <!-- ======== PART 1: WHY VERCEL ======== -->
+      <h2>Part 1: Why Vercel?</h2>
+
+      <p>Ang <strong>Vercel</strong> ay ang company na gumawa ng Next.js — kaya sila ang may pinakamahusay na deployment experience para dito. Libre ang hobby plan at may kasamang:</p>
+      <ul>
+        <li>Automatic HTTPS/SSL</li>
+        <li>Global CDN (100+ locations)</li>
+        <li>Automatic preview deployments sa bawat git push</li>
+        <li>Serverless functions para sa API Routes</li>
+        <li>Custom domains</li>
+      </ul>
+
+      <div class="tip">
+        <strong>Alternatives</strong>
+        Pwede ring i-deploy sa <strong>Netlify</strong> (gamit ang <code>@netlify/plugin-nextjs</code>), <strong>Cloudflare Pages</strong>, o sa traditional hosting gamit ang <code>next build && next start</code>.
+      </div>
+
+      <!-- ======== PART 2: PREPARATION ======== -->
+      <h2>Part 2: Preparation</h2>
+
+      <p>Bago mag-deploy, siguraduhing handa na ang iyong project:</p>
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p><strong>Push to GitHub (or GitLab/Bitbucket):</strong></p>
+          <pre><code>git init
+git add .
+git commit -m "Initial commit: Next.js portfolio"
+git remote add origin https://github.com/your-username/my-portfolio.git
+git push -u origin main</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p><strong>Check your next.config.js</strong> — dapat may <code>images</code> config kung gagamit ka ng external images:</p>
+          <pre><code>// next.config.js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    domains: ['localhost', 'your-laravel-api.com'],
+  },
+};
+
+module.exports = nextConfig;</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p><strong>I-update ang API URLs</strong> — sa development, <code>localhost:8000</code> ang gamit. Sa production, kailangan ng actual URL ng iyong deployed Laravel API:</p>
+          <pre><code># .env.local (local development)
+NEXT_PUBLIC_API_URL=http://localhost:8000/api
+
+# .env.production (ito ang gagamitin sa Vercel)
+NEXT_PUBLIC_API_URL=https://your-laravel-api.com/api</code></pre>
+          <p>Sa Vercel, ise-set mo ang environment variables sa dashboard — hindi mo kailangan ng <code>.env.production</code> file.</p>
+        </div>
+      </div>
+
+      <!-- ======== PART 3: DEPLOY TO VERCEL ======== -->
+      <h2>Part 3: Deploy to Vercel</h2>
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p><strong>Create a Vercel account:</strong> Pumunta sa <a href="https://vercel.com" target="_blank">vercel.com</a> at mag-sign up gamit ang GitHub account.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p><strong>Import your repository:</strong>
+            <ul>
+              <li>Click "Add New" → "Project"</li>
+              <li>Piliin ang <code>my-portfolio</code> repository</li>
+              <li>I-configure ang project settings</li>
+            </ul>
+          </p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p><strong>Add environment variables:</strong> Sa Vercel dashboard, mag-add ng:</p>
+          <pre><code>NEXT_PUBLIC_API_URL = https://your-laravel-api.com/api</code></pre>
+          <p>Kung may API token, idagdag din ito bilang environment variable (walang NEXT_PUBLIC_ prefix para secure).</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <p><strong>Click "Deploy":</strong> Awtomatikong magbu-build at magde-deploy ang Vercel. Pagkatapos ng ilang minuto, makikita mo ang URL ng iyong site (hal. <code>my-portfolio.vercel.app</code>).</p>
+        </div>
+      </div>
+
+      <div class="tip">
+        <strong>Continuous Deployment</strong>
+        Tuwing magpi-push ka ng changes sa GitHub, awtomatikong nagde-deploy ang Vercel. May <strong>Preview URLs</strong> din para sa bawat branch — perfect para sa testing bago i-merge sa main.
+      </div>
+
+      <!-- ======== PART 4: CUSTOM DOMAIN ======== -->
+      <h2>Part 4: Custom Domain</h2>
+
+      <p>Gawing propesyonal ang iyong portfolio gamit ang sarili mong domain:</p>
+
+      <ol>
+        <li>Bumili ng domain mula sa Namecheap, GoDaddy, o Google Domains</li>
+        <li>Sa Vercel dashboard, pumunta sa project → "Domains"</li>
+        <li>I-type ang iyong domain at i-click "Add"</li>
+        <li>I-update ang DNS settings ng iyong domain:
+          <ul>
+            <li>Add CNAME record: <code>www</code> → <code>cname.vercel-dns.com</code></li>
+            <li>Add A records: ituro ang apex domain (@) sa Vercel's IP addresses</li>
+          </ul>
+        </li>
+        <li>Hintaying mag-propagate ang DNS (mga ilang minuto hanggang 48 oras)</li>
+      </ol>
+
+      <p>Vercel will automatically provision an SSL certificate para sa iyong domain — libre!</p>
+
+      <!-- ======== PART 5: CONNECTING TO LARAVEL ======== -->
+      <h2>Part 5: Connecting to Laravel Backend</h2>
+
+      <p>Para sa production, kailangan mo ring i-deploy ang iyong Laravel API. Pwedeng gamitin ang:</p>
+      <ul>
+        <li><strong>Shared hosting</strong> (cPanel) — cheapest option (~$5-10/month)</li>
+        <li><strong>DigitalOcean / Linode</strong> — VPS (~$6-12/month)</li>
+        <li><strong>Laravel Forge</strong> — managed server (~$15/month)</li>
+      </ul>
+
+      <p>Kapag naka-deploy na ang Laravel API, i-update ang <code>NEXT_PUBLIC_API_URL</code> sa Vercel dashboard:</p>
+      <pre><code>NEXT_PUBLIC_API_URL = https://api.yourdomain.com</code></pre>
+
+      <div class="warning">
+        <strong>CORS</strong>
+        Siguraduhing may <strong>CORS</strong> configuration ang iyong Laravel backend para payagan ang requests mula sa iyong Next.js domain. Gamitin ang <code>config/cors.php</code> o <code>laravel-cors</code> package.<br><br>
+        <code>'allowed_origins' =&gt; ['https://my-portfolio.vercel.app']</code>
+      </div>
+
+      <!-- ======== QUIZ ======== -->
+      <h2>Quick Quiz</h2>
+
+      <div class="quiz-item">
+        <div class="quiz-question">1. Saan ang pinakamadaling lugar para i-deploy ang Next.js app?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q1" value="a"> Shared hosting (cPanel)</label>
+          <label class="quiz-option"><input type="radio" name="q1" value="b"> Vercel</label>
+          <label class="quiz-option"><input type="radio" name="q1" value="c"> GitHub Pages</label>
+        </div>
+        <div class="quiz-feedback" id="feedback1"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">2. Paano mag-a-update ang Vercel kapag nag-push ka ng changes sa GitHub?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q2" value="a"> Manu-manong redeploy sa dashboard</label>
+          <label class="quiz-option"><input type="radio" name="q2" value="b"> Awtomatikong nagde-deploy</label>
+          <label class="quiz-option"><input type="radio" name="q2" value="c"> Kailangan ng webhook setup</label>
+        </div>
+        <div class="quiz-feedback" id="feedback2"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">3. Ano ang kailangan i-setup sa Laravel backend para payagan ang requests mula sa Next.js?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q3" value="a"> HTTPS</label>
+          <label class="quiz-option"><input type="radio" name="q3" value="b"> CORS</label>
+          <label class="quiz-option"><input type="radio" name="q3" value="c"> CSRF protection</label>
+        </div>
+        <div class="quiz-feedback" id="feedback3"></div>
+      </div>
+
+      <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+      <!-- ======== PROJECT ======== -->
+      <div class="project">
+        <h3>Final Project: Deploy Your Portfolio</h3>
+        <p>Ilive ang iyong buong portfolio:</p>
+        <ul>
+          <li>I-push ang iyong Next.js project sa GitHub</li>
+          <li>I-deploy sa Vercel (import project mula sa GitHub)</li>
+          <li>Magdagdag ng <code>NEXT_PUBLIC_API_URL</code> environment variable</li>
+          <li>I-verify na gumagana ang blog posts mula sa Laravel API</li>
+          <li>Magdagdag ng custom domain (optional)</li>
+          <li>I-share ang iyong live portfolio URL!</li>
+        </ul>
+      </div>
+
+      <!-- ======== SUMMARY ======== -->
+      <h2>Summary</h2>
+      <ul>
+        <li>Ang Vercel ang pinakamadaling platform para i-deploy ang Next.js</li>
+        <li>Awtomatikong deployment sa bawat git push — continuous deployment</li>
+        <li>Mag-set ng environment variables sa Vercel dashboard (hindi sa .env file)</li>
+        <li>Pwedeng magdagdag ng custom domain na may libreng SSL</li>
+        <li>Mag-set ng CORS sa Laravel para payagan ang requests mula sa iyong frontend</li>
+      </ul>
+
+      <div class="info">
+        <strong>Phase 3 Complete!</strong>
+        Binabati kita! Natapos mo na ang <strong>Phase 3: Advanced Frontend</strong>. Mula sa paggawa ng Next.js project hanggang sa deployment — marami ka nang natutunan!<br><br>
+        Ang susunod ay <strong>Phase 4: Mobile & Deployment</strong> kung saan matututunan mo ang React Native para gumawa ng mobile app!
+      </div>
+
+      <div class="lesson-nav"></div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../assets/lessons-data.js"></script>
+<script src="../assets/lesson-nav.js"></script>
+<script src="../assets/sidebar.js"></script>
+<script>
+  function checkQuiz() {
+    var answers = { q1: 'b', q2: 'b', q3: 'b' };
+    for (var key in answers) {
+      var sel = document.querySelector('input[name="' + key + '"]:checked');
+      var fb = document.getElementById('feedback' + key.slice(1));
+      if (!sel) { fb.textContent = 'Please select an answer!'; fb.className = 'quiz-feedback incorrect'; continue; }
+      if (sel.value === answers[key]) {
+        fb.textContent = '\u2705 Tama! ' + (key === 'q1' ? 'Ang Vercel ang pinakamadali at optimized para sa Next.js.' : key === 'q2' ? 'Awtomatiko — Vercel ay naka-integrate sa GitHub.' : 'Ang CORS ang kailangan para payagan ang cross-origin requests.');
+        fb.className = 'quiz-feedback correct';
+      } else {
+        fb.textContent = '\u274C Hindi tama. ' + (key === 'q1' ? 'Hint: Ang Next.js ay ginawa ng Vercel.' : key === 'q2' ? 'Hint: Wala nang kailangang manual steps.' : 'Hint: Ito ang naka-block kapag ang frontend at backend ay magkaibang domains.');
+        fb.className = 'quiz-feedback incorrect';
+      }
+    }
+  }
+</script>
+</body>
+</html>

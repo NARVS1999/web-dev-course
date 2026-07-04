@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0004: Git & GitHub for Freelancers</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body><div class="lesson-layout"><aside class="lesson-sidebar" id="lesson-sidebar"></aside><main class="lesson-main">
+  <div class="lesson-container">
+    <h1>Lesson 0004: Git & GitHub for Freelancers</h1>
+    <p><em>I-backup at i-track ang iyong code — parang "save point" sa video game!</em></p>
+
+    <div class="info">
+      <strong>Lesson Goal</strong>
+      Matututunan mo ang Git basics: i-save ang versions ng code mo, mag-upload sa GitHub, at mag-collaborate sa ibang devs. Essential ito para sa freelancing — kailangan ng clients na may version control ka!
+    </div>
+
+    <h2>Ano ang Git at GitHub?</h2>
+    <p>
+      <strong>Git</strong> ay isang <em>version control system</em> — parang "save points" sa video game. Bawat save ay pwedeng balikan kung nagkamali ka. Pwede kang mag-experiment nang walang takot!
+    </p>
+    <p>
+      <strong>GitHub</strong> naman ay ang "cloud save" ng iyong Git repositories. Do mo ini-upload ang code mo para ma-access kahit saan, at para makita ng clients o employers.
+    </p>
+
+    <blockquote>
+      <strong>Para sa freelancing:</strong> Ibig sabihin, kapag nasira mo ang code mo (at mangyayari yan!), pwede kang bumalik sa working version. At kapag may client kang gusto makita ang progress mo — bigay mo lang ang GitHub link mo!
+    </blockquote>
+
+    <h2>Step 1: Install Git</h2>
+
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <p>Pumunta sa <a href="https://git-scm.com/downloads" target="_blank">git-scm.com</a> at i-download ang Git para sa Windows.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <p>I-install ito — <strong>default settings lang</strong>, next-next lang. May kasama nang <strong>Git Bash</strong> na gamit natin.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">3</div>
+      <div class="step-content">
+        <p>I-open ang <strong>Git Bash</strong> at i-set ang name at email mo:</p>
+        <pre><code>git config --global user.name "Juan Dela Cruz"
+git config --global user.email "juan@example.com"</code></pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">4</div>
+      <div class="step-content">
+        <p>I-verify na naka-install na:</p>
+        <pre><code>git --version
+# Result: git version 2.x.x</code></pre>
+      </div>
+    </div>
+
+    <h2>Step 2: Create a GitHub Account</h2>
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <p>Pumunta sa <a href="https://github.com" target="_blank">github.com</a> at mag-sign up — <strong>libre</strong> ang account!</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <p>Gumawa ng <strong>personal access token</strong> (ito na ang bagong password):</p>
+        <ul>
+          <li>Settings → Developer settings → Personal access tokens → Tokens (classic)</li>
+          <li>Generate new token → i-check ang "repo" at "workflow"</li>
+          <li><strong>I-save mo ang token!</strong> Hindi mo na ito makikita ulit.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="warning">
+      <strong>Important</strong>
+      Simula 2021, hindi na pwede ang password sa Git command line. Gumamit ng <strong>personal access token</strong> or <strong>GitHub CLI</strong>. I-treat ang token gaya ng password — huwag ipakita kahit kanino!
+    </div>
+
+    <h2>Git Basics — Ang mga Command na Dapat Mong Kabisaduhin</h2>
+
+    <table>
+      <tr><th>Command</th><th>Gamit</th></tr>
+      <tr><td><code>git init</code></td><td>Gawing Git repository ang isang folder (isang beses lang)</td></tr>
+      <tr><td><code>git status</code></td><td>Check kung ano ang nagbago sa files</td></tr>
+      <tr><td><code>git add .</code></td><td>I-stage lahat ng changes para i-save</td></tr>
+      <tr><td><code>git add filename.html</code></td><td>I-stage ang specific file lang</td></tr>
+      <tr><td><code>git commit -m "message"</code></td><td>I-save ang staged changes (gumawa ng "save point")</td></tr>
+      <tr><td><code>git log</code></td><td>Tingnan ang history ng commits</td></tr>
+      <tr><td><code>git remote add origin URL</code></td><td>I-connect sa GitHub repository</td></tr>
+      <tr><td><code>git push origin main</code></td><td>I-upload ang commits sa GitHub</td></tr>
+      <tr><td><code>git pull origin main</code></td><td>I-download ang latest changes mula sa GitHub</td></tr>
+    </table>
+
+    <h2>The Git Workflow</h2>
+    <p>Eto ang main workflow na gagamitin mo araw-araw:</p>
+
+    <pre><code># 1. Mag-check ng status
+git status
+
+# 2. I-stage ang changes
+git add .
+
+# 3. I-commit (gumawa ng save point)
+git commit -m "Added contact form with CSS styling"
+
+# 4. I-upload sa GitHub
+git push origin main</code></pre>
+
+    <div class="tip">
+      <strong>Good Commit Messages</strong>
+      Sumulat ng malinaw na commit messages sa English. Hindi "update" o "fix" lang. Gawin mong descriptive:
+      <br><code>git commit -m "Add responsive navigation bar with media queries"</code>
+      <br><code>git commit -m "Fix form validation bug on empty email field"</code>
+    </div>
+
+    <h2>🛠️ Mini-Project: I-upload ang Portfolio Mo sa GitHub</h2>
+
+    <div class="project">
+      <h3>Gawin Mo Ito!</h3>
+      <p>I-upload ang portfolio.html mo sa GitHub — ito na ang unang repository mo!</p>
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p>Sa GitHub, i-click ang <strong>"New repository"</strong> (may "+" sign sa右上). Pangalanan ito na <code>my-portfolio</code>. <strong>Wag i-check</strong> ang "Initialize with README".</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p>Sa Git Bash, pumunta sa folder ng portfolio mo at i-run:</p>
+          <pre><code>cd /c/Users/Admin/Desktop/project/portfolio
+
+git init
+git add .
+git commit -m "Initial commit: portfolio website with HTML, CSS, and JS"
+
+git remote add origin https://github.com/YOUR_USERNAME/my-portfolio.git
+git branch -M main
+git push -u origin main</code></pre>
+          <p><em>Palitan ang "YOUR_USERNAME" ng actual GitHub username mo.</em></p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p>I-refresh ang GitHub page mo — makikita mo na ang portfolio mo online! 🎉</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <p><strong>I-share mo sa client!</strong> Ang URL na <code>https://github.com/YOUR_USERNAME/my-portfolio</code> ay pwedeng ipakita sa potential clients para makita nila ang code mo.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>Create a .gitignore File</h2>
+    <p>May mga file na <em>hindi</em> dapat i-upload sa GitHub — like <code>node_modules</code>, <code>.env</code> files, at operating system files. Gumawa ng <code>.gitignore</code> file sa root ng project mo:</p>
+
+    <pre><code># OS files
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+vendor/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log</code></pre>
+
+    <div class="tip">
+      <strong>Quick Start</strong>
+      Pumunta sa <a href="https://www.toptal.com/developers/gitignore" target="_blank">gitignore.io</a> at i-type ang "Windows", "Node", "VisualStudioCode" — mag-ge-generate ito ng .gitignore para sa'yo!
+    </div>
+
+    <h2>Undoing Changes — Kung Nagkamali Ka</h2>
+
+    <pre><code># Undo changes sa isang file (ibalik sa last commit)
+git checkout -- filename.html
+
+# Unstage a file (bago pa ma-commit)
+git reset HEAD filename.html
+
+# Baliktarin ang last commit (keep changes)
+git reset --soft HEAD~1
+
+# Baliktarin ang last commit (remove changes completely)
+git reset --hard HEAD~1
+
+# Gumawa ng bagong commit para i-undo ang previous commit
+git revert HEAD</code></pre>
+
+    <div class="warning">
+      <strong>Warning</strong>
+      Ang <code>git reset --hard</code> ay <strong>permanently nagde-delete</strong> ng changes. Gamitin nang may pag-iingat! Kapag may pag-aalinlangan, <code>git revert</code> ang safer option.
+    </div>
+
+    <h2>Branching — Para sa mga Experiment</h2>
+
+    <pre><code># Gumawa ng bagong branch
+git branch feature-dark-mode
+
+# Lumipat sa branch
+git checkout feature-dark-mode
+# or (shorter):
+git switch feature-dark-mode
+
+# Gumawa at lumipat in one command
+git checkout -b feature-dark-mode
+
+# I-merge ang branch sa main
+git checkout main
+git merge feature-dark-mode
+
+# I-delete ang branch (optional)
+git branch -d feature-dark-mode</code></pre>
+
+    <div class="info">
+      <strong>Bakit magagamit ito sa freelancing?</strong>
+      Kapag may client kang gusto magdagdag ng feature, gumawa ka ng bagong branch. Hindi mo sira ang main code. Kapag approve na, i-merge mo. Kung hindi approve, delete lang — walang nasira!
+    </div>
+
+    <h2>Collaboration Workflow (For Future Freelance Teams)</h2>
+
+    <pre><code># Kunin ang latest code ng team
+git pull origin main
+
+# Gumawa ng branch para sa task mo
+git checkout -b feature-new-page
+
+# Gawin ang changes...
+git add .
+git commit -m "Add new about page"
+
+# I-upload ang branch mo
+git push -u origin feature-new-page
+
+# Sa GitHub, gumawa ng Pull Request (PR)
+# Hintaying ma-review at ma-approve
+# Then merge!</code></pre>
+
+    <div class="tip">
+      <strong>Pull Request (PR)</strong>
+      Ang PR ay para kang nagsasabi sa team, "Uy, may ginawa akong changes. Paki-check bago i-merge sa main." Ito ang standard workflow sa professional teams.
+    </div>
+
+    <h2>✅ Quiz</h2>
+
+    <div class="quiz-item">
+      <p class="quiz-question">1. Ano ang tamang sequence para mag-save at mag-upload ng changes sa GitHub?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q1" value="a"> <code>commit → add → push</code></label>
+        <label class="quiz-option"><input type="radio" name="q1" value="b"> <code>add → commit → push</code></label>
+        <label class="quiz-option"><input type="radio" name="q1" value="c"> <code>push → add → commit</code></label>
+        <label class="quiz-option"><input type="radio" name="q1" value="d"> <code>commit → push → add</code></label>
+      </div>
+      <div class="quiz-feedback" id="feedback1"></div>
+    </div>
+
+    <div class="quiz-item">
+      <p class="quiz-question">2. Aling command ang ginagamit para i-download ang latest changes mula sa GitHub?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q2" value="a"> <code>git push</code></label>
+        <label class="quiz-option"><input type="radio" name="q2" value="b"> <code>git download</code></label>
+        <label class="quiz-option"><input type="radio" name="q2" value="c"> <code>git pull</code></label>
+        <label class="quiz-option"><input type="radio" name="q2" value="d"> <code>git fetch</code></label>
+      </div>
+      <div class="quiz-feedback" id="feedback2"></div>
+    </div>
+
+    <div class="quiz-item">
+      <p class="quiz-question">3. Bakit ginagamit ang branch sa development?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q3" value="a"> Para gumawa ng kopya ng repo</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="b"> Para magtrabaho nang isolated sa bagong feature nang hindi nasisira ang main code</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="c"> Para i-delete ang files</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="d"> Para magdagdag ng collaborators</label>
+      </div>
+      <div class="quiz-feedback" id="feedback3"></div>
+    </div>
+
+    <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+    <h2>📖 Recommended Resources</h2>
+    <ul>
+      <li><a href="https://git-scm.com/doc" target="_blank">Git Official Documentation</a> — Complete reference</li>
+      <li><a href="https://skills.github.com/" target="_blank">GitHub Skills</a> — Free interactive courses</li>
+      <li><a href="https://learngitbranching.js.org/" target="_blank">Learn Git Branching</a> — Interactive game para matuto ng branching</li>
+      <li><a href="https://www.freecodecamp.org/news/git-and-github-for-beginners/" target="_blank">freeCodeCamp: Git for Beginners</a> — Comprehensive guide</li>
+    </ul>
+
+    <h2>🎯 Lesson Summary</h2>
+    <ul>
+      <li><strong>Git</strong> = version control (save points ng code mo)</li>
+      <li><strong>GitHub</strong> = cloud storage para sa Git repositories</li>
+      <li>Main workflow: <code>add → commit → push</code></li>
+      <li>Magandang commit messages: descriptive at nasa English</li>
+      <li><strong>.gitignore</strong> — para i-exclude ang sensitive o unnecessary files</li>
+      <li><strong>Branches</strong> — para magtrabaho sa bagong feature nang safe</li>
+      <li><strong>Pull Request</strong> — para mag-pa-review ng code bago i-merge</li>
+      <li>Na-upload mo na ang portfolio mo sa GitHub! 🎉</li>
+    </ul>
+
+    <div class="info">
+      <strong>May tanong?</strong>
+      Ang Git ay isang skill na natututunan sa pamamagitan ng paggamit. Sa una, nakakalito ang mga commands, pero sa practice, magiging second nature na ito. Continue lang!
+    </div>
+
+    <div class="lesson-nav">
+      <a href="0003-javascript-essentials.html" class="nav-link nav-prev">← Previous: JavaScript Essentials</a>
+      <a href="0005-mysql-database-basics.html" class="nav-link nav-next">Next: MySQL & Database Basics →</a>
+    </div>
+
+  </div>
+
+  <script>
+    function checkQuiz() {
+      const answers = { q1: 'b', q2: 'c', q3: 'b' };
+      for (let [name, correct] of Object.entries(answers)) {
+        const selected = document.querySelector(`input[name="${name}"]:checked`);
+        const feedback = document.getElementById(`feedback${name.slice(1)}`);
+        if (!selected) {
+          feedback.textContent = 'Please select an answer!';
+          feedback.className = 'quiz-feedback incorrect';
+          continue;
+        }
+        if (selected.value === correct) {
+          feedback.textContent = '✅ Tama! Magaling!';
+          feedback.className = 'quiz-feedback correct';
+        } else {
+          let hint = '';
+          if (name === 'q1') hint = 'Hint: I-stage muna (add), saka i-save (commit), saka i-upload (push).';
+          if (name === 'q2') hint = 'Hint: Kapag gusto mong kunin ang latest, "pull" mo.';
+          if (name === 'q3') hint = 'Hint: Ang branch ay isolation — para hindi maapektuhan ang main code.';
+          feedback.textContent = `❌ Hindi tama. ${hint}`;
+          feedback.className = 'quiz-feedback incorrect';
+        }
+      }
+    }
+  </script>
+</main></div><script src="../assets/lessons-data.js"></script><script src="../assets/lesson-nav.js"></script><script src="../assets/sidebar.js"></script></body>
+</html>

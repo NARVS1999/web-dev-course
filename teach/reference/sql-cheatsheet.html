@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Cheatsheet</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    @media print { body { font-size: 9pt; } }
+  </style>
+</head>
+<body>
+  <div class="lesson-container">
+    <h1>SQL Cheatsheet</h1>
+
+    <h2>CREATE Table</h2>
+    <pre><code>CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  age INT DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+
+    <h2>INSERT</h2>
+    <pre><code>INSERT INTO users (name, email, age)
+VALUES ('Juan', 'juan@example.com', 25);</code></pre>
+
+    <h2>SELECT</h2>
+    <pre><code>SELECT * FROM users;
+SELECT name, email FROM users;
+SELECT * FROM users WHERE age >= 25;
+SELECT * FROM users ORDER BY name ASC;
+SELECT * FROM users LIMIT 10;
+SELECT COUNT(*) FROM users;
+SELECT * FROM users WHERE name LIKE '%an%';</code></pre>
+
+    <h2>UPDATE</h2>
+    <pre><code>UPDATE users SET age = 26 WHERE id = 1;</code></pre>
+
+    <h2>DELETE</h2>
+    <pre><code>DELETE FROM users WHERE id = 1;</code></pre>
+
+    <h2>JOINs</h2>
+    <pre><code>-- INNER JOIN (may match lang)
+SELECT users.name, posts.title
+FROM users
+INNER JOIN posts ON users.id = posts.user_id;
+
+-- LEFT JOIN (lahat mula sa left)
+SELECT users.name, posts.title
+FROM users
+LEFT JOIN posts ON users.id = posts.user_id;</code></pre>
+
+    <h2>Operators in WHERE</h2>
+    <pre><code>=	   equal
+!=     not equal
+>      greater than
+<      less than
+>=     greater or equal
+<=     less or equal
+AND    both conditions
+OR     either condition
+IN     match in a list
+BETWEEN  range (inclusive)
+LIKE   pattern matching (% = wildcard)
+IS NULL   null check</code></pre>
+
+    <h2>Aggregate Functions</h2>
+    <pre><code>COUNT(*)       count of rows
+SUM(column)    sum of values
+AVG(column)    average
+MAX(column)    maximum
+MIN(column)    minimum
+
+-- With GROUP BY
+SELECT user_id, COUNT(*) FROM posts GROUP BY user_id;</code></pre>
+
+    <h2>Quick Commands</h2>
+    <pre><code>SHOW DATABASES;
+SHOW TABLES;
+DESCRIBE users;
+DROP TABLE users;
+DROP DATABASE blog_db;</code></pre>
+  </div>
+</body>
+</html>

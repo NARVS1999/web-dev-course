@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML Cheatsheet</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .tag-group { margin-bottom: 1.5rem; }
+    .tag-group h3 { 
+      font-family: var(--font-mono); 
+      background: var(--code-bg); 
+      display: inline-block; 
+      padding: 0.2rem 0.6rem; 
+      border-radius: 4px;
+    }
+    .tag-group code { font-size: 0.9rem; }
+    .print-only { display: none; }
+    @media print {
+      body { font-size: 10pt; }
+      .tag-group { break-inside: avoid; }
+      .no-print { display: none; }
+      .print-only { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <div class="lesson-container">
+    <h1>HTML Reference / Cheatsheet</h1>
+    <p class="no-print"><em>Isang mabilisang reference ng mga HTML tags. I-print mo para lagi mong makita!</em></p>
+    <p class="print-only"><em>Print-friendly HTML cheatsheet.</em></p>
+
+    <h2>Document Structure</h2>
+    <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;Page Title&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    Content here
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+    <h2>Text Content</h2>
+    <table>
+      <tr><th>Tag</th><th>Description</th><th>Example</th></tr>
+      <tr><td><code>&lt;h1&gt;-&lt;h6&gt;</code></td><td>Headings (h1 largest)</td><td><code>&lt;h1&gt;Title&lt;/h1&gt;</code></td></tr>
+      <tr><td><code>&lt;p&gt;</code></td><td>Paragraph</td><td><code>&lt;p&gt;Text here&lt;/p&gt;</code></td></tr>
+      <tr><td><code>&lt;strong&gt;</code></td><td>Bold / important</td><td><code>&lt;strong&gt;Bold&lt;/strong&gt;</code></td></tr>
+      <tr><td><code>&lt;em&gt;</code></td><td>Italic / emphasis</td><td><code>&lt;em&gt;Italic&lt;/em&gt;</code></td></tr>
+      <tr><td><code>&lt;br&gt;</code></td><td>Line break</td><td><code>Line 1&lt;br&gt;Line 2</code></td></tr>
+      <tr><td><code>&lt;hr&gt;</code></td><td>Horizontal rule</td><td><code>&lt;hr&gt;</code></td></tr>
+    </table>
+
+    <h2>Links & Images</h2>
+    <table>
+      <tr><th>Tag</th><th>Description</th><th>Example</th></tr>
+      <tr><td><code>&lt;a&gt;</code></td><td>Hyperlink</td><td><code>&lt;a href="url"&gt;Text&lt;/a&gt;</code></td></tr>
+      <tr><td><code>&lt;img&gt;</code></td><td>Image (self-closing)</td><td><code>&lt;img src="url" alt="desc"&gt;</code></td></tr>
+    </table>
+
+    <h2>Lists</h2>
+    <table>
+      <tr><th>Tag</th><th>Description</th><th>Example</th></tr>
+      <tr><td><code>&lt;ul&gt;</code></td><td>Unordered list (bullets)</td><td><code>&lt;ul&gt;&lt;li&gt;Item&lt;/li&gt;&lt;/ul&gt;</code></td></tr>
+      <tr><td><code>&lt;ol&gt;</code></td><td>Ordered list (numbers)</td><td><code>&lt;ol&gt;&lt;li&gt;First&lt;/li&gt;&lt;/ol&gt;</code></td></tr>
+      <tr><td><code>&lt;li&gt;</code></td><td>List item</td><td>Ginagamit sa loob ng ul/ol</td></tr>
+    </table>
+
+    <h2>Forms</h2>
+    <table>
+      <tr><th>Tag</th><th>Description</th><th>Example</th></tr>
+      <tr><td><code>&lt;form&gt;</code></td><td>Form container</td><td><code>&lt;form action="/submit"&gt;...&lt;/form&gt;</code></td></tr>
+      <tr><td><code>&lt;input&gt;</code></td><td>Input field (self-closing)</td><td><code>&lt;input type="text"&gt;</code></td></tr>
+      <tr><td><code>&lt;label&gt;</code></td><td>Label for input</td><td><code>&lt;label for="id"&gt;Name&lt;/label&gt;</code></td></tr>
+      <tr><td><code>&lt;textarea&gt;</code></td><td>Multi-line text input</td><td><code>&lt;textarea&gt;&lt;/textarea&gt;</code></td></tr>
+      <tr><td><code>&lt;button&gt;</code></td><td>Clickable button</td><td><code>&lt;button&gt;Submit&lt;/button&gt;</code></td></tr>
+      <tr><td><code>&lt;select&gt;</code></td><td>Dropdown list</td><td><code>&lt;select&gt;&lt;option&gt;...&lt;/option&gt;&lt;/select&gt;</code></td></tr>
+    </table>
+
+    <h2>Semantic HTML5</h2>
+    <table>
+      <tr><th>Tag</th><th>Description</th></tr>
+      <tr><td><code>&lt;header&gt;</code></td><td>Introductory content / navigation</td></tr>
+      <tr><td><code>&lt;nav&gt;</code></td><td>Navigation links</td></tr>
+      <tr><td><code>&lt;main&gt;</code></td><td>Primary content (use once per page)</td></tr>
+      <tr><td><code>&lt;section&gt;</code></td><td>Thematic group of content</td></tr>
+      <tr><td><code>&lt;article&gt;</code></td><td>Self-contained content (blog post, news)</td></tr>
+      <tr><td><code>&lt;aside&gt;</code></td><td>Tangentially related content</td></tr>
+      <tr><td><code>&lt;footer&gt;</code></td><td>Footer (copyright, links)</td></tr>
+      <tr><td><code>&lt;figure&gt;</code></td><td>Image with caption</td></tr>
+      <tr><td><code>&lt;figcaption&gt;</code></td><td>Caption for figure</td></tr>
+    </table>
+
+    <h2>Containers</h2>
+    <table>
+      <tr><th>Tag</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>&lt;div&gt;</code></td><td>Block</td><td>Generic block container</td></tr>
+      <tr><td><code>&lt;span&gt;</code></td><td>Inline</td><td>Generic inline container</td></tr>
+    </table>
+
+    <h2>Tables</h2>
+    <pre><code>&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Header 1&lt;/th&gt;
+      &lt;th&gt;Header 2&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Data 1&lt;/td&gt;
+      &lt;td&gt;Data 2&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+
+    <h2>Comments</h2>
+    <pre><code>&lt;!-- Hindi ito visible sa page --&gt;
+&lt;!-- Ito ay comment -- gamitin for notes --&gt;</code></pre>
+
+    <h2>Input Types</h2>
+    <table>
+      <tr><th>Type</th><th>Gamit</th></tr>
+      <tr><td><code>text</code></td><td>Regular text</td></tr>
+      <tr><td><code>email</code></td><td>Email address</td></tr>
+      <tr><td><code>password</code></td><td>Password (nakatago ang characters)</td></tr>
+      <tr><td><code>number</code></td><td>Numbers only</td></tr>
+      <tr><td><code>file</code></td><td>File upload</td></tr>
+      <tr><td><code>checkbox</code></td><td>Checkbox</td></tr>
+      <tr><td><code>radio</code></td><td>Radio button (isa lang pwedeng piliin)</td></tr>
+      <tr><td><code>submit</code></td><td>Submit button</td></tr>
+      <tr><td><code>date</code></td><td>Date picker</td></tr>
+      <tr><td><code>color</code></td><td>Color picker</td></tr>
+    </table>
+
+    <div class="tip">
+      <strong>Pro Tip</strong>
+      Sa VS Code, i-type mo lang <code>!</code> at pindutin <kbd>Tab</kbd> — mag-ge-generate ng basic HTML structure! Or i-type <code>html:5</code> at press Tab.
+    </div>
+  </div>
+</body>
+</html>

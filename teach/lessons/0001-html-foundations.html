@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0001: HTML Foundations</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body><div class="lesson-layout"><aside class="lesson-sidebar" id="lesson-sidebar"></aside><main class="lesson-main">
+  <div class="lesson-container">
+    <h1>Lesson 0001: HTML Foundations</h1>
+    <p><em>Ang pundasyon ng bawat website — simulan natin dito!</em></p>
+
+    <div class="info">
+      <strong>Lesson Goal</strong>
+      Sa araling ito, matututunan mo ang basic na structure ng HTML at makakagawa ka ng sarili mong web page — isang simple portfolio page na pwedeng ipakita sa potential clients!
+    </div>
+
+    <h2>Ano ang HTML?</h2>
+    <p>
+      Ang <strong>HTML</strong> (HyperText Markup Language) ang <em>istruktura</em> ng bawat website.
+      Isipin mo na lang na ang website ay isang bahay:
+    </p>
+    <ul>
+      <li><strong>HTML</strong> = ang mga <em>semento, haligi, at dingding</em> — yung structure</li>
+      <li><strong>CSS</strong> = ang <em>pintura, disenyo, at dekorasyon</em> — pampaganda</li>
+      <li><strong>JavaScript</strong> = ang <em>kuryente at plumbing</em> — nagpapagalaw at nagpapa-function</li>
+    </ul>
+    <p>
+      Sa lesson na ito, HTML lang muna ang focus natin. Sa susunod na lessons, dadagdagan natin ng CSS para gumanda, at JavaScript para gumalaw!
+    </p>
+
+    <h2>Structure ng isang HTML Document</h2>
+    <p>Eto ang pinaka-basic na HTML document:</p>
+    <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;My First Page&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Hello, World!&lt;/h1&gt;
+  &lt;p&gt;This is my first web page.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+    <h3>Ano ang ibig sabihin ng bawat parte?</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Tag</th>
+          <th>Kahulugan</th>
+          <th>Gamit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>&lt;!DOCTYPE html&gt;</code></td>
+          <td>Document type declaration</td>
+          <td>Sinasabi nito sa browser na HTML5 ang gamit mo</td>
+        </tr>
+        <tr>
+          <td><code>&lt;html&gt;</code></td>
+          <td>Root element</td>
+          <td>Ang pinaka-parent ng lahat ng elements</td>
+        </tr>
+        <tr>
+          <td><code>&lt;head&gt;</code></td>
+          <td>Metadata container</td>
+          <td>Dito nilalagay ang title, styles, at ibang impormasyon na hindi visible sa page</td>
+        </tr>
+        <tr>
+          <td><code>&lt;body&gt;</code></td>
+          <td>Content container</td>
+          <td>Dito nilalagay ang lahat ng nakikita sa page</td>
+        </tr>
+        <tr>
+          <td><code>&lt;h1&gt;</code> to <code>&lt;h6&gt;</code></td>
+          <td>Headings</td>
+          <td>Mga heading/subheading — <code>h1</code> ang pinakamalaki, <code>h6</code> ang pinakamaliit</td>
+        </tr>
+        <tr>
+          <td><code>&lt;p&gt;</code></td>
+          <td>Paragraph</td>
+          <td>Paragraph text</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="tip">
+      <strong>Tip</strong>
+      Pansinin na halos lahat ng HTML tags ay may <strong>opening tag</strong> (<code>&lt;tag&gt;</code>) at <strong>closing tag</strong> (<code>&lt;/tag&gt;</code>). May "/" ang closing tag!
+    </div>
+
+    <h2>Mga Common HTML Tags na Dapat Mong Malaman</h2>
+
+    <h3>Text Tags</h3>
+    <pre><code>&lt;h1&gt;Main Heading&lt;/h1&gt;
+&lt;h2&gt;Subheading&lt;/h2&gt;
+&lt;h3&gt;Sub-subheading&lt;/h3&gt;
+&lt;p&gt;Ito ay isang paragraph ng text. Pwedeng mahaba o maiksi.&lt;/p&gt;
+&lt;p&gt;Ito ay &lt;strong&gt;bold text&lt;/strong&gt; at ito ay &lt;em&gt;italic text&lt;/em&gt;.&lt;/p&gt;</code></pre>
+
+    <h3>Links at Images</h3>
+    <pre><code>&lt;!-- Link --&gt;
+&lt;a href="https://google.com"&gt;Pumunta sa Google&lt;/a&gt;
+
+&lt;!-- Image --&gt;
+&lt;img src="https://example.com/photo.jpg" alt="Description ng photo"&gt;</code></pre>
+
+    <div class="info">
+      <strong>Pansinin</strong>
+      Ang <code>&lt;img&gt;</code> ay <strong>self-closing tag</strong> — walang closing tag! At ang <code>&lt;a&gt;</code> naman ay may <code>href</code> attribute na nagsasabi kung saan mapupunta ang link.
+    </div>
+
+    <h3>Lists</h3>
+    <h4>Unordered List (may bullet points)</h4>
+    <pre><code>&lt;ul&gt;
+  &lt;li&gt;Item 1&lt;/li&gt;
+  &lt;li&gt;Item 2&lt;/li&gt;
+  &lt;li&gt;Item 3&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+
+    <h4>Ordered List (may numbers)</h4>
+    <pre><code>&lt;ol&gt;
+  &lt;li&gt;Unang hakbang&lt;/li&gt;
+  &lt;li&gt;Ikalawang hakbang&lt;/li&gt;
+  &lt;li&gt;Ikatlong hakbang&lt;/li&gt;
+&lt;/ol&gt;</code></pre>
+
+    <h3>Forms (important to para sa freelancing!)</h3>
+    <pre><code>&lt;form&gt;
+  &lt;label for="name"&gt;Name:&lt;/label&gt;
+  &lt;input type="text" id="name" name="name"&gt;
+
+  &lt;label for="email"&gt;Email:&lt;/label&gt;
+  &lt;input type="email" id="email" name="email"&gt;
+
+  &lt;button type="submit"&gt;Send&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+
+    <h3>Div at Span — Ang mga Container</h3>
+    <pre><code>&lt;div&gt;Ito ay isang block-level container. Mag-isa sa linya.&lt;/div&gt;
+&lt;span&gt;Ito ay inline container. Sumasabay sa text.&lt;/span&gt;</code></pre>
+
+    <div class="tip">
+      <strong>Block vs Inline</strong>
+      <strong>Block elements</strong> (like <code>&lt;div&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;h1&gt;</code>) — mag-isa sa linya, full width.
+      <strong>Inline elements</strong> (like <code>&lt;span&gt;</code>, <code>&lt;a&gt;</code>, <code>&lt;strong&gt;</code>) — sumasabay sa text, hindi nag-break ng linya.
+    </div>
+
+    <h2>Semantic HTML — Why It Matters for Freelancing</h2>
+    <p>
+      Ang <strong>semantic HTML</strong> ay ang paggamit ng tamang tag para sa tamang purpose.
+      Halimbawa, sa halip na <code>&lt;div&gt;</code> lang ang gamitin sa lahat, may mas meaningful na tags:
+    </p>
+    <pre><code>&lt;header&gt;Site Header / Navigation&lt;/header&gt;
+&lt;nav&gt;Navigation Menu&lt;/nav&gt;
+&lt;main&gt;Main Content&lt;/main&gt;
+&lt;section&gt;A Section of Content&lt;/section&gt;
+&lt;article&gt;A Blog Post or Article&lt;/article&gt;
+&lt;aside&gt;Sidebar / Related Content&lt;/aside&gt;
+&lt;footer&gt;Footer / Copyright&lt;/footer&gt;</code></pre>
+
+    <blockquote>
+      <strong>Bakit important ito sa freelancing?</strong> Mas gusto ng Google ang semantic HTML (mas maganda ang SEO — Search Engine Optimization). At mas madali i-maintain ng ibang devs ang code mo. Ibig sabihin: mas mataas ang value ng services mo sa clients!
+    </blockquote>
+
+    <h2>🛠️ Mini-Project: Your First Portfolio Page</h2>
+
+    <div class="project">
+      <h3>Gawin Mo Ito!</h3>
+      <p>Gumawa ng HTML file na <code>portfolio.html</code> sa desktop mo. I-save at i-open sa browser.</p>
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p>Gumawa ng bagong file na <code>portfolio.html</code></p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p>Kopyahin itong code:</p>
+        </div>
+      </div>
+
+      <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;My Portfolio&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;header&gt;
+    &lt;h1&gt;Juan Dela Cruz&lt;/h1&gt;
+    &lt;p&gt;Web Developer | Freelancer&lt;/p&gt;
+  &lt;/header&gt;
+
+  &lt;main&gt;
+    &lt;section&gt;
+      &lt;h2&gt;About Me&lt;/h2&gt;
+      &lt;p&gt;I'm learning web development para makapag-start ng freelancing career. I love building things that help people.&lt;/p&gt;
+    &lt;/section&gt;
+
+    &lt;section&gt;
+      &lt;h2&gt;My Skills&lt;/h2&gt;
+      &lt;ul&gt;
+        &lt;li&gt;HTML (kakasimula palang!)&lt;/li&gt;
+        &lt;li&gt;CSS (soon!)&lt;/li&gt;
+        &lt;li&gt;JavaScript (next!)&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/section&gt;
+
+    &lt;section&gt;
+      &lt;h2&gt;Contact Me&lt;/h2&gt;
+      &lt;p&gt;Email: &lt;a href="mailto:juan@example.com"&gt;juan@example.com&lt;/a&gt;&lt;/p&gt;
+    &lt;/section&gt;
+  &lt;/main&gt;
+
+  &lt;footer&gt;
+    &lt;p&gt;&amp;copy; 2026 Juan Dela Cruz&lt;/p&gt;
+  &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p><strong>I-open sa browser!</strong> Double-click ang <code>portfolio.html</code> file — makikita mo na ang unang website mo! 🎉</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>✅ Quiz: Subukan ang Natutunan Mo!</h2>
+
+    <div class="quiz-item">
+      <p class="quiz-question">1. Ano ang tamang tag para sa pinakamalaking heading?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q1" value="h1"> <code>&lt;h1&gt;</code></label>
+        <label class="quiz-option"><input type="radio" name="q1" value="heading"> <code>&lt;heading&gt;</code></label>
+        <label class="quiz-option"><input type="radio" name="q1" value="h6"> <code>&lt;h6&gt;</code></label>
+        <label class="quiz-option"><input type="radio" name="q1" value="head"> <code>&lt;head&gt;</code></label>
+      </div>
+      <div class="quiz-feedback" id="feedback1"></div>
+    </div>
+
+    <div class="quiz-item">
+      <p class="quiz-question">2. Alin sa mga ito ang tamang HTML link?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q2" value="1"> <code>&lt;a href="page.html"&gt;Link&lt;/a&gt;</code></label>
+        <label class="quiz-option"><input type="radio" name="q2" value="2"> <code>&lt;link src="page.html"&gt;Link&lt;/link&gt;</code></label>
+        <label class="quiz-option"><input type="radio" name="q2" value="3"> <code>&lt;a src="page.html"&gt;Link&lt;/a&gt;</code></label>
+        <label class="quiz-option"><input type="radio" name="q2" value="4"> <code>&lt;link href="page.html"&gt;Link&lt;/link&gt;</code></label>
+      </div>
+      <div class="quiz-feedback" id="feedback2"></div>
+    </div>
+
+    <div class="quiz-item">
+      <p class="quiz-question">3. Ano ang pinagkaiba ng <code>&lt;div&gt;</code> at <code>&lt;span&gt;</code>?</p>
+      <div class="quiz-options">
+        <label class="quiz-option"><input type="radio" name="q3" value="a"> Walang pinagkaiba</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="b"> Ang <code>div</code> ay block-level, ang <code>span</code> ay inline</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="c"> Ang <code>div</code> ay inline, ang <code>span</code> ay block-level</label>
+        <label class="quiz-option"><input type="radio" name="q3" value="d"> Ang <code>div</code> ay for links, ang <code>span</code> ay for images</label>
+      </div>
+      <div class="quiz-feedback" id="feedback3"></div>
+    </div>
+
+    <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+    <h2>📖 Recommended Resources</h2>
+    <ul>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML" target="_blank">MDN Web Docs: HTML</a> — Ang best reference for HTML. Kung may nakalimutan ka, dito ka tumingin.</li>
+      <li><a href="https://www.w3schools.com/html/" target="_blank">W3Schools HTML Tutorial</a> — Beginner-friendly na may interactive exercises.</li>
+    </ul>
+
+    <h2>🎯 Lesson Summary</h2>
+    <ul>
+      <li>Ang <strong>HTML</strong> ang nagbibigay ng structure sa website (parang skeleton ng tao)</li>
+      <li>Ang HTML document ay may <code>&lt;head&gt;</code> (metadata) at <code>&lt;body&gt;</code> (visible content)</li>
+      <li>May iba't ibang tags: headings, paragraphs, links, images, lists, at forms</li>
+      <li>Ang <strong>semantic HTML</strong> ay important para sa SEO at maintainability — mas gusto ng clients 'to</li>
+      <li>Nakagawa ka na ng <strong>unang portfolio page mo!</strong> 🎉</li>
+    </ul>
+
+    <div class="info">
+      <strong>May tanong?</strong>
+      Huwag kang mahiyang magtanong sa akin! Kung may hindi malinaw, sabihin mo lang. Ito ang unang hakbang mo sa web development journey — importante na maintindihan mo ang basics.
+    </div>
+
+    <div class="lesson-nav">
+      <a href="0002-css-styling.html" class="nav-link nav-next nav-link-only">Next: CSS Styling →</a>
+    </div>
+
+  </div>
+
+  <script>
+    function checkQuiz() {
+      const answers = {
+        q1: 'h1',
+        q2: '1',
+        q3: 'b'
+      };
+
+      for (let [name, correct] of Object.entries(answers)) {
+        const selected = document.querySelector(`input[name="${name}"]:checked`);
+        const feedback = document.getElementById(`feedback${name.slice(1)}`);
+
+        if (!selected) {
+          feedback.textContent = 'Please select an answer!';
+          feedback.className = 'quiz-feedback incorrect';
+          continue;
+        }
+
+        if (selected.value === correct) {
+          feedback.textContent = '✅ Tama! Magaling!';
+          feedback.className = 'quiz-feedback correct';
+        } else {
+          let hint = '';
+          if (name === 'q1') hint = 'Hint: Ang pinakamalaking heading ay h1, hindi heading o head.';
+          if (name === 'q2') hint = 'Hint: Ang tamang attribute para sa link ay "href" at ang tag ay "a".';
+          if (name === 'q3') hint = 'Hint: Ang div ay block-level (mag-isa sa linya), ang span ay inline (sumasabay sa text).';
+          feedback.textContent = `❌ Hindi tama. ${hint}`;
+          feedback.className = 'quiz-feedback incorrect';
+        }
+      }
+    }
+  </script>
+
+</main></div><script src="../assets/lessons-data.js"></script><script src="../assets/lesson-nav.js"></script><script src="../assets/sidebar.js"></script></body>
+</html>

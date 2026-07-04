@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0019: Final Project — Full-Stack Freelance App</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="lesson-layout">
+  <aside class="lesson-sidebar" id="lesson-sidebar"></aside>
+  <main class="lesson-main">
+    <div class="lesson-container">
+
+      <h1>Lesson 0019: Final Project</h1>
+      <p><em>Pagsamahin ang lahat ng iyong natutunan sa isang kumpletong full-stack freelance project!</em></p>
+
+      <div class="info">
+        <strong>Lesson Goal</strong>
+        Magplano at bumuo ng isang full-stack application na gumagamit ng Laravel API, Next.js frontend, at React Native mobile app — tulad ng ginagawa sa totoong freelance projects.
+      </div>
+
+      <h2>Part 1: Project Planning</h2>
+      <p>Bago mag-code, kailangan ng plano. Ito ang process na gagamitin mo sa totoong freelance projects:</p>
+
+      <h3>Step 1: Client Requirements</h3>
+      <p>Halimbawa project: <strong>Task Manager App</strong> — isang app kung saan pwedeng mag-add, mag-edit, at mag-delete ng tasks, may categories, at user authentication.</p>
+
+      <h3>Step 2: Feature List</h3>
+      <ul>
+        <li>User registration at login (Sanctum API tokens)</li>
+        <li>Task CRUD (create, read, update, delete)</li>
+        <li>Categories para sa tasks</li>
+        <li>Search at filter ng tasks</li>
+        <li>Web interface (Next.js)</li>
+        <li>Mobile interface (React Native)</li>
+      </ul>
+
+      <h3>Step 3: API Design</h3>
+      <pre><code>POST   /api/register        # Register user
+POST   /api/login            # Login
+GET    /api/tasks             # List tasks
+POST   /api/tasks             # Create task
+GET    /api/tasks/{id}        # Get single task
+PUT    /api/tasks/{id}        # Update task
+DELETE /api/tasks/{id}        # Delete task
+GET    /api/categories        # List categories</code></pre>
+
+      <h2>Part 2: Backend — Laravel API</h2>
+
+      <h3>Setup</h3>
+      <pre><code>composer create-project laravel/laravel task-manager-api
+cd task-manager-api
+php artisan make:model Task -m
+php artisan make:model Category -m
+php artisan make:controller API/TaskController --api
+php artisan make:controller API/CategoryController --api
+php artisan make:controller API/AuthController
+php artisan install:api  # Install Sanctum</code></pre>
+
+      <h3>Database Migrations</h3>
+      <pre><code>// database/migrations/xxxx_create_tasks_table.php
+Schema::create('tasks', function (Blueprint $table) {
+  $table->id();
+  $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+  $table->foreignId('category_id')->constrained();
+  $table->string('title');
+  $table->text('description')->nullable();
+  $table->boolean('completed')->default(false);
+  $table->timestamps();
+});
+
+// database/migrations/xxxx_create_categories_table.php
+Schema::create('categories', function (Blueprint $table) {
+  $table->id();
+  $table->string('name');
+  $table->string('color')->default('#2563eb');
+  $table->timestamps();
+});</code></pre>
+
+      <h3>API Routes</h3>
+      <pre><code>// routes/api.php
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::middleware('auth:sanctum')->group(function () {
+  Route::apiResource('tasks', TaskController::class);
+  Route::apiResource('categories', CategoryController::class)->only(['index']);
+});</code></pre>
+
+      <h2>Part 3: Frontend — Next.js</h2>
+      <p>Gumawa ng Next.js project at ikonek ito sa Laravel API:</p>
+
+      <pre><code>npx create-next-app@latest task-manager-web
+cd task-manager-web</code></pre>
+
+      <pre><code>// pages/index.js — Login page
+export default function Login() {
+  const handleLogin = async (e) =&gt; {
+    e.preventDefault();
+    const res = await fetch('http://localhost:8000/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: e.target.email.value,
+        password: e.target.password.value,
+      }),
+    });
+    const data = await res.json();
+    localStorage.setItem('token', data.token);
+    // Redirect to dashboard
+  };
+
+  return (
+    &lt;form onSubmit={handleLogin}&gt;
+      &lt;input name="email" type="email" placeholder="Email" /&gt;
+      &lt;input name="password" type="password" placeholder="Password" /&gt;
+      &lt;button type="submit"&gt;Login&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}</code></pre>
+
+      <pre><code>// pages/tasks.js — Task list (authenticated)
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+
+export default function Tasks() {
+  const [tasks, setTasks] = useState([]);
+  const router = useRouter();
+
+  useEffect(() =&gt; {
+    const token = localStorage.getItem('token');
+    if (!token) { router.push('/'); return; }
+
+    fetch('http://localhost:8000/api/tasks', {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+      .then(res =&gt; res.json())
+      .then(data =&gt; setTasks(data.data));
+  }, []);
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;My Tasks&lt;/h1&gt;
+      {tasks.map(task =&gt; (
+        &lt;div key={task.id}&gt;
+          &lt;h3&gt;{task.title}&lt;/h3&gt;
+          &lt;p&gt;{task.description}&lt;/p&gt;
+        &lt;/div&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+      <h2>Part 4: Mobile — React Native</h2>
+      <p>Gumawa ng Expo project at gamitin ang navigation at API integration na natutunan mo:</p>
+
+      <pre><code>npx create-expo-app@latest task-manager-mobile
+cd task-manager-mobile
+npx expo install @react-navigation/native @react-navigation/native-stack @react-native-async-storage/async-storage</code></pre>
+
+      <pre><code>// config.js
+const API_URL = 'http://192.168.1.5:8000/api';
+export default API_URL;
+
+// Ganito rin ang pattern sa Lessons 0015-0017</code></pre>
+
+      <div class="tip">
+        <strong>Code Reuse</strong>
+        Pwede kang gumawa ng hiwalay na <code>api.js</code> file na may helper functions para sa lahat ng API calls — para hindi mo na ulit-ulitin ang fetch logic sa bawat screen.
+      </div>
+
+      <!-- ======== QUIZ ======== -->
+      <h2>Quick Quiz</h2>
+
+      <div class="quiz-item">
+        <div class="quiz-question">1. Ano ang unang dapat gawin bago mag-code ng project?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q1" value="a"> Mag-install ng frameworks</label>
+          <label class="quiz-option"><input type="radio" name="q1" value="b"> Magplano ng features at API design</label>
+          <label class="quiz-option"><input type="radio" name="q1" value="c"> Gumawa ng UI design</label>
+        </div>
+        <div class="quiz-feedback" id="feedback1"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">2. Aling Laravel package ang ginagamit para sa API authentication?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q2" value="a"> Laravel UI</label>
+          <label class="quiz-option"><input type="radio" name="q2" value="b"> Sanctum</label>
+          <label class="quiz-option"><input type="radio" name="q2" value="c"> Laravel Auth</label>
+        </div>
+        <div class="quiz-feedback" id="feedback2"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">3. Paano mo i-sesend ang auth token sa API request?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q3" value="a"> Sa URL parameter</label>
+          <label class="quiz-option"><input type="radio" name="q3" value="b"> Sa <code>Authorization: Bearer {token}</code> header</label>
+          <label class="quiz-option"><input type="radio" name="q3" value="c"> Sa request body</label>
+        </div>
+        <div class="quiz-feedback" id="feedback3"></div>
+      </div>
+
+      <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+      <!-- ======== PROJECT ======== -->
+      <div class="project">
+        <h3>Final Project: Task Manager App</h3>
+        <p>Buuin ang kumpletong Task Manager App:</p>
+        <ul>
+          <li><strong>Laravel API:</strong> Authentication (Sanctum), Task CRUD, Categories, Search/Filter</li>
+          <li><strong>Next.js Frontend:</strong> Login page, Task dashboard, Create/Edit task form</li>
+          <li><strong>React Native Mobile:</strong> Login screen, Task list (FlatList), Create task form</li>
+          <li>I-deploy ang API sa shared hosting at ang web sa Vercel</li>
+          <li>I-share ang GitHub repository bilang portfolio piece</li>
+        </ul>
+        <p>Pumili ka ng sarili mong project idea kung gusto mo — ang mahalaga ay may <strong>Laravel API + Next.js frontend + React Native mobile</strong>.</p>
+      </div>
+
+      <!-- ======== SUMMARY ======== -->
+      <h2>Summary</h2>
+      <ul>
+        <li>Magplano muna bago mag-code — features, API design, database schema</li>
+        <li>Gamitin ang Laravel Sanctum para sa API authentication</li>
+        <li>I-structure ang Next.js app na may pages para sa login at task management</li>
+        <li>Gamitin ang React Navigation at AsyncStorage sa React Native mobile app</li>
+        <li>Ang kumpletong full-stack project ay magandang portfolio piece para sa freelancing</li>
+      </ul>
+
+      <div class="info">
+        <strong>Next Steps</strong>
+        Sa huling lesson (0020), matututunan mo ang <strong>Freelancing Guide</strong> — kung paano magsimula ng freelancing career, humanap ng clients, mag-presyo ng projects, at gumawa ng winning proposal!
+      </div>
+
+      <div class="lesson-nav"></div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../assets/lessons-data.js"></script>
+<script src="../assets/lesson-nav.js"></script>
+<script src="../assets/sidebar.js"></script>
+<script>
+  function checkQuiz() {
+    var answers = { q1: 'b', q2: 'b', q3: 'b' };
+    for (var key in answers) {
+      var sel = document.querySelector('input[name="' + key + '"]:checked');
+      var fb = document.getElementById('feedback' + key.slice(1));
+      if (!sel) { fb.textContent = 'Please select an answer!'; fb.className = 'quiz-feedback incorrect'; continue; }
+      if (sel.value === answers[key]) {
+        fb.textContent = '\u2705 Tama! ' + (key === 'q1' ? 'Planning muna bago mag-code — iwas revision.' : key === 'q2' ? 'Sanctum ang ginagamit para sa SPA at API authentication.' : 'Ang Bearer token sa Authorization header ang standard.');
+        fb.className = 'quiz-feedback correct';
+      } else {
+        fb.textContent = '\u274C Hindi tama. ' + (key === 'q1' ? 'Hint: Dapat may roadmap ka bago magsimula.' : key === 'q2' ? 'Hint: Ito ang ginamit natin sa Lesson 0008.' : 'Hint: Ito ang standard na format para sa API tokens.');
+        fb.className = 'quiz-feedback incorrect';
+      }
+    }
+  }
+</script>
+</body>
+</html>

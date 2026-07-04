@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0015: React Native Basics</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="lesson-layout">
+  <aside class="lesson-sidebar" id="lesson-sidebar"></aside>
+  <main class="lesson-main">
+    <div class="lesson-container">
+
+      <h1>Lesson 0015: React Native Basics</h1>
+      <p><em>Gawing mobile app ang iyong React skills — isang codebase, parehong iOS at Android!</em></p>
+
+      <div class="info">
+        <strong>Lesson Goal</strong>
+        Matutunan ang pundasyon ng React Native gamit ang Expo: setup, core components, styling, at Flexbox — at makagawa ng isang working counter app sa iyong phone.
+      </div>
+
+      <h2>Part 1: Ano ang React Native?</h2>
+      <p>Ang <strong>React Native</strong> ay isang framework na gumagamit ng React para gumawa ng <strong>native mobile apps</strong> (iOS at Android). Hindi ito WebView o hybrid app — native components talaga ang ginagamit.</p>
+
+      <div class="tip">
+        <strong>React vs React Native</strong>
+        Sa React (web), gumagamit tayo ng <code>&lt;div&gt;</code>, <code>&lt;span&gt;</code>, <code>&lt;h1&gt;</code>. Sa React Native naman, <code>&lt;View&gt;</code>, <code>&lt;Text&gt;</code>, atbp. Pareho pa rin ang konsepto ng components, props, at state!
+      </div>
+
+      <h2>Part 2: Setup with Expo</h2>
+      <p>Ang <strong>Expo</strong> ay isang toolchain na nagpapadali ng React Native development — no need para sa Xcode (iOS) o Android Studio para magsimula.</p>
+
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p><strong>I-install ang Node.js</strong> — kung wala ka pa, nasa <a href="https://nodejs.org" target="_blank">nodejs.org</a> (LTS version).</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p><strong>Install Expo CLI at gumawa ng project:</strong></p>
+          <pre><code>npx create-expo-app@latest MyMobileApp
+cd MyMobileApp</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p><strong>I-download ang "Expo Go" app</strong> sa iyong phone (Play Store o App Store).</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <p><strong>Run the project:</strong></p>
+          <pre><code>npx expo start</code></pre>
+          <p>May lalabas na QR code sa terminal. I-scan ito gamit ang Expo Go app sa iyong phone — lilitaw agad ang iyong app!</p>
+        </div>
+      </div>
+
+      <h2>Part 3: Core Components</h2>
+      <p>Sa React Native, ang basic building blocks ay iba sa web:</p>
+
+      <table>
+        <tr><th>React (Web)</th><th>React Native</th><th>Purpose</th></tr>
+        <tr><td><code>&lt;div&gt;</code></td><td><code>&lt;View&gt;</code></td><td>Container / layout</td></tr>
+        <tr><td><code>&lt;span&gt;</code>, <code>&lt;p&gt;</code></td><td><code>&lt;Text&gt;</code></td><td>Text display</td></tr>
+        <tr><td><code>&lt;input&gt;</code></td><td><code>&lt;TextInput&gt;</code></td><td>Text input field</td></tr>
+        <tr><td><code>&lt;button&gt;</code></td><td><code>&lt;Button&gt;</code> / <code>&lt;TouchableOpacity&gt;</code></td><td>Pressable element</td></tr>
+        <tr><td><code>&lt;img&gt;</code></td><td><code>&lt;Image&gt;</code></td><td>Display images</td></tr>
+        <tr><td><code>&lt;ul&gt;</code>/<code>&lt;li&gt;</code></td><td><code>&lt;FlatList&gt;</code> / <code>&lt;ScrollView&gt;</code></td><td>Scrollable lists</td></tr>
+      </table>
+
+      <p>Halimbawa ng isang simpleng screen:</p>
+
+      <pre><code>// App.js
+import { View, Text, StyleSheet } from 'react-native';
+
+export default function App() {
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;Text style={styles.title}&gt;Hello, Mobile!&lt;/Text&gt;
+      &lt;Text style={styles.subtitle}&gt;My first React Native app&lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 8,
+  },
+});</code></pre>
+
+      <h2>Part 4: Styling in React Native</h2>
+      <p>Walang CSS sa React Native — lahat ay JavaScript objects gamit ang <code>StyleSheet.create()</code>:</p>
+
+      <ul>
+        <li>Pareho pa rin ang properties: <code>backgroundColor</code>, <code>fontSize</code>, <code>padding</code>, <code>margin</code></li>
+        <li>Ang properties ay <strong>camelCase</strong> — <code>background-color</code> → <code>backgroundColor</code></li>
+        <li>Ang layout ay <strong>Flexbox</strong> by default — <code>display: flex</code> automatic</li>
+        <li>Ang <code>flexDirection</code> ay <code>column</code> (hindi <code>row</code> tulad ng web)</li>
+      </ul>
+
+      <h2>Part 5: State & Events</h2>
+      <p>Gumagana ang <code>useState</code> at <code>useEffect</code> sa React Native tulad ng sa web:</p>
+
+      <pre><code>import { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;Text style={styles.count}&gt;{count}&lt;/Text&gt;
+      &lt;TouchableOpacity
+        style={styles.button}
+        onPress={() =&gt; setCount(count + 1)}
+      &gt;
+        &lt;Text style={styles.buttonText}&gt;+1&lt;/Text&gt;
+      &lt;/TouchableOpacity&gt;
+    &lt;/View&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  count: { fontSize: 48, fontWeight: 'bold', marginBottom: 20 },
+  button: {
+    backgroundColor: '#2563eb',
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  buttonText: { color: '#fff', fontSize: 18, fontWeight: '600' },
+});</code></pre>
+
+      <div class="tip">
+        <strong>TouchableOpacity vs Button</strong>
+        Ang <code>TouchableOpacity</code> ay mas flexible — pwedeng maglaman ng kahit anong component sa loob, may opacity feedback kapag pinindot. Ang <code>Button</code> naman ay limited sa text lang at may sariling style.
+      </div>
+
+      <!-- ======== QUIZ ======== -->
+      <h2>Quick Quiz</h2>
+
+      <div class="quiz-item">
+        <div class="quiz-question">1. Ano ang kapalit ng <code>&lt;div&gt;</code> sa React Native?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q1" value="a"> <code>&lt;View&gt;</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="b"> <code>&lt;Container&gt;</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="c"> <code>&lt;Box&gt;</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback1"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">2. Ano ang default na <code>flexDirection</code> sa React Native?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q2" value="a"> <code>row</code></label>
+          <label class="quiz-option"><input type="radio" name="q2" value="b"> <code>column</code></label>
+          <label class="quiz-option"><input type="radio" name="q2" value="c"> <code>none</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback2"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">3. Paano mo ila-launch ang Expo project para matingnan sa phone?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q3" value="a"> <code>npm run build</code> at i-install ang APK</label>
+          <label class="quiz-option"><input type="radio" name="q3" value="b"> I-scan ang QR code gamit ang Expo Go app</label>
+          <label class="quiz-option"><input type="radio" name="q3" value="c"> I-upload sa App Store</label>
+        </div>
+        <div class="quiz-feedback" id="feedback3"></div>
+      </div>
+
+      <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+      <!-- ======== PROJECT ======== -->
+      <div class="project">
+        <h3>Mini-Project: Counter App</h3>
+        <p>Gumawa ng counter app na may:</p>
+        <ul>
+          <li>Display ng current count (malaking Text)</li>
+          <li>+1 button gamit ang TouchableOpacity</li>
+          <li>Reset button na nagse-set ng count sa 0</li>
+          <li>Magandang styling — centered, may background color, rounded buttons</li>
+          <li>I-run sa iyong phone gamit ang Expo Go</li>
+        </ul>
+      </div>
+
+      <!-- ======== SUMMARY ======== -->
+      <h2>Summary</h2>
+      <ul>
+        <li>Ang React Native ay gumagamit ng React para gumawa ng native mobile apps</li>
+        <li>Ang Expo ay nagpapadali ng RN development — <code>create-expo-app</code> + Expo Go app</li>
+        <li>Core components: View, Text, TextInput, TouchableOpacity, Image, FlatList</li>
+        <li>Ang styling ay gamit ang <code>StyleSheet.create()</code> — camelCase properties, Flexbox by default</li>
+        <li>Ang state at events ay pareho sa React web (useState, onPress)</li>
+      </ul>
+
+      <div class="info">
+        <strong>Next Steps</strong>
+        Sa susunod na lesson (0016), matututunan mo ang <strong>React Navigation</strong> — kung paano gumawa ng multiple screens at mag-navigate sa pagitan nila!
+      </div>
+
+      <div class="lesson-nav"></div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../assets/lessons-data.js"></script>
+<script src="../assets/lesson-nav.js"></script>
+<script src="../assets/sidebar.js"></script>
+<script>
+  function checkQuiz() {
+    var answers = { q1: 'a', q2: 'b', q3: 'b' };
+    for (var key in answers) {
+      var sel = document.querySelector('input[name="' + key + '"]:checked');
+      var fb = document.getElementById('feedback' + key.slice(1));
+      if (!sel) { fb.textContent = 'Please select an answer!'; fb.className = 'quiz-feedback incorrect'; continue; }
+      if (sel.value === answers[key]) {
+        fb.textContent = '\u2705 Tama! ' + (key === 'q1' ? 'Ang View ang base container sa React Native.' : key === 'q2' ? 'Ang default flexDirection ay column sa RN (hindi row tulad ng web).' : 'I-scan ang QR code sa Expo Go para makita agad ang app.');
+        fb.className = 'quiz-feedback correct';
+      } else {
+        fb.textContent = '\u274C Hindi tama. ' + (key === 'q1' ? 'Hint: Ito ang pinaka-basic na container component.' : key === 'q2' ? 'Hint: Iba ito sa CSS Flexbox default.' : 'Hint: Pwede mong i-test ang app nang hindi nagbu-build.');
+        fb.className = 'quiz-feedback incorrect';
+      }
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 0012: Next.js Data Fetching</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="lesson-layout">
+  <aside class="lesson-sidebar" id="lesson-sidebar"></aside>
+  <main class="lesson-main">
+    <div class="lesson-container">
+
+      <h1>Lesson 0012: Next.js Data Fetching</h1>
+      <p><em>Kumuha ng data mula sa iyong Laravel API at i-render ito gamit ang SSG, SSR, at ISR.</em></p>
+
+      <div class="info">
+        <strong>Lesson Goal</strong>
+        Matutunan ang tatlong data fetching strategies ng Next.js — Static Generation (SSG), Server-Side Rendering (SSR), at Incremental Static Regeneration (ISR) — at kung kailan gagamitin ang bawat isa.
+      </div>
+
+      <!-- ======== OVERVIEW ======== -->
+      <h2>Part 1: Overview — Tatlong Paraan ng Data Fetching</h2>
+
+      <table>
+        <tr><th>Method</th><th>Kailan nagfe-fetch?</th><th>Gamitin kapag...</th></tr>
+        <tr>
+          <td><code>getStaticProps</code> (SSG)</td>
+          <td>Sa build time</td>
+          <td>Ang data ay bihirang magbago (blog posts, about page)</td>
+        </tr>
+        <tr>
+          <td><code>getServerSideProps</code> (SSR)</td>
+          <td>Sa bawat request</td>
+          <td>Ang data ay laging bago (user dashboard, real-time data)</td>
+        </tr>
+        <tr>
+          <td><code>getStaticProps + revalidate</code> (ISR)</td>
+          <td>Sa build time + periodic revalidation</td>
+          <td>Ang data ay nagbabago pero hindi gaano kadalas (CMS content)</td>
+        </tr>
+      </table>
+
+      <div class="tip">
+        <strong>Rule of thumb:</strong> SSG &gt; ISR &gt; SSR. Static generation ang pinakamabilis dahil pre-built HTML ang serve. SSR ang pinakamabagal dahil sa bawat request ay nagre-render ang server. Gamitin ang SSR <strong>lamang</strong> kung kailangan talaga ng real-time data.
+      </div>
+
+      <!-- ======== PART 2: SSG ======== -->
+      <h2>Part 2: Static Generation (getStaticProps)</h2>
+
+      <p>I-connect natin ang Next.js portfolio natin sa Laravel API na ginawa natin sa Phase 2.</p>
+
+      <p>Una, siguraduhing naka-run ang iyong Laravel backend:</p>
+      <pre><code>cd ~/my-blog-api
+php artisan serve --port=8000</code></pre>
+
+      <p>Ngayon, i-fetch ang blog posts mula sa API gamit ang <code>getStaticProps</code>:</p>
+
+      <pre><code>// pages/blog/index.js
+import Link from 'next/link';
+
+export default function Blog({ posts }) {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Blog&lt;/h1&gt;
+      {posts.length === 0 ? (
+        &lt;p&gt;No posts yet.&lt;/p&gt;
+      ) : (
+        &lt;ul&gt;
+          {posts.map(post =&gt; (
+            &lt;li key={post.id}&gt;
+              &lt;Link href={`/blog/${post.id}`}&gt;
+                {post.title}
+              &lt;/Link&gt;
+              &lt;p&gt;{post.content.substring(0, 100)}...&lt;/p&gt;
+            &lt;/li&gt;
+          ))}
+        &lt;/ul&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+
+// This runs at BUILD TIME
+export async function getStaticProps() {
+  const res = await fetch('http://localhost:8000/api/posts');
+  const json = await res.json();
+
+  return {
+    props: {
+      posts: json.data || [],
+    },
+  };
+}</code></pre>
+
+      <div class="warning">
+        <strong>Note on API URL</strong>
+        Dahil ang <code>getStaticProps</code> ay tumatakbo sa server (sa build time), ang <code>localhost:8000</code> ay ang Laravel server. Sa production, papalitan mo ito ng production URL ng iyong API.
+      </div>
+
+      <h3>Dynamic Routes</h3>
+
+      <p>Para sa individual blog post page, gumamit ng <strong>dynamic route</strong> kasama ang <code>getStaticPaths</code>:</p>
+
+      <pre><code>// pages/blog/[id].js
+
+export default function Post({ post }) {
+  return (
+    &lt;div&gt;
+      &lt;Link href="/blog"&gt;&amp;larr; Back to Blog&lt;/Link&gt;
+      &lt;h1&gt;{post.title}&lt;/h1&gt;
+      &lt;p&gt;By {post.author?.name || 'Unknown'}&lt;/p&gt;
+      &lt;div&gt;{post.content}&lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+
+// Tinutukoy kung anong dynamic paths ang ie-generate
+export async function getStaticPaths() {
+  const res = await fetch('http://localhost:8000/api/posts');
+  const json = await res.json();
+  const posts = json.data || [];
+
+  const paths = posts.map(post =&gt; ({
+    params: { id: String(post.id) },
+  }));
+
+  return { paths, fallback: 'blocking' };
+}
+
+// Nagfe-fetch ng data para sa specific post
+export async function getStaticProps({ params }) {
+  const res = await fetch(`http://localhost:8000/api/posts/${params.id}`);
+  const json = await res.json();
+
+  return {
+    props: {
+      post: json.data || json,
+    },
+  };
+}</code></pre>
+
+      <div class="tip">
+        <strong>What is fallback?</strong>
+        <ul>
+          <li><code>fallback: false</code> — 404 kung hindi kasama sa <code>paths</code></li>
+          <li><code>fallback: true</code> — mag-display ng loading state, then i-generate ang page sa browser</li>
+          <li><code>fallback: 'blocking'</code> — maghintay hanggang ma-generate ang page sa server (recommended)</li>
+        </ul>
+      </div>
+
+      <!-- ======== PART 3: ISR ======== -->
+      <h2>Part 3: Incremental Static Regeneration (ISR)</h2>
+
+      <p>Paano kung may bagong post sa Laravel API? Hindi na kailangan i-rebuild ang buong site — gamitin ang <strong>ISR</strong> sa pamamagitan ng <code>revalidate</code>:</p>
+
+      <pre><code>export async function getStaticProps() {
+  const res = await fetch('http://localhost:8000/api/posts');
+  const json = await res.json();
+
+  return {
+    props: {
+      posts: json.data || [],
+    },
+    // Re-generate ang page every 60 seconds kung may request
+    revalidate: 60,
+  };
+}</code></pre>
+
+      <p>Ang <code>revalidate: 60</code> ay nangangahulugang: "i-serve ang naka-cache na page, ngunit i-revalidate ito sa background every 60 seconds". Ang susunod na bumisita pagkatapos ng 60s ay makakakita ng updated content.</p>
+
+      <!-- ======== PART 4: SSR ======== -->
+      <h2>Part 4: Server-Side Rendering (getServerSideProps)</h2>
+
+      <p>Gamitin ang SSR kung kailangan ng <strong>real-time data</strong> na unique sa bawat request:</p>
+
+      <pre><code>// pages/profile.js — nangangailangan ng fresh data bawat request
+export default function Profile({ user }) {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;{user.name}'s Profile&lt;/h1&gt;
+      &lt;p&gt;Email: {user.email}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+
+export async function getServerSideProps() {
+  const res = await fetch('http://localhost:8000/api/user', {
+    headers: {
+      // Sa totoong app, kukuha ka ng token mula sa cookies
+      Authorization: 'Bearer ' + process.env.API_TOKEN,
+    },
+  });
+  const json = await res.json();
+
+  return {
+    props: { user: json },
+  };
+}</code></pre>
+
+      <!-- ======== PART 5: CLIENT-SIDE FETCHING ======== -->
+      <h2>Part 5: Client-Side Fetching (SWR)</h2>
+
+      <p>Para sa data na nagbabago sa browser (e.g., pagkatapos mag-submit ng form), gamitin ang <strong>client-side fetching</strong> gamit ang <code>swr</code> library:</p>
+
+      <pre><code>npm install swr</code></pre>
+
+      <pre><code>// components/PostList.js
+import useSWR from 'swr';
+
+const fetcher = (url) =&gt; fetch(url).then(r =&gt; r.json());
+
+export default function PostList() {
+  const { data, error, isLoading } = useSWR(
+    'http://localhost:8000/api/posts',
+    fetcher
+  );
+
+  if (isLoading) return &lt;p&gt;Loading...&lt;/p&gt;;
+  if (error) return &lt;p&gt;Error loading posts.&lt;/p&gt;;
+
+  return (
+    &lt;ul&gt;
+      {data?.data?.map(post =&gt; (
+        &lt;li key={post.id}&gt;{post.title}&lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}</code></pre>
+
+      <div class="tip">
+        <strong>SWR Benefits</strong>
+        <ul>
+          <li>Automatic re-fetching kapag na-focus ulit ang tab</li>
+          <li>Caching — hindi na magre-request kung may cached data pa</li>
+          <li>Optimistic UI — pwedeng mag-update agad ng UI bago pa dumating ang response</li>
+          <li>Pagination at infinite loading — built-in</li>
+        </ul>
+      </div>
+
+      <!-- ======== QUIZ ======== -->
+      <h2>Quick Quiz</h2>
+
+      <div class="quiz-item">
+        <div class="quiz-question">1. Aling data fetching method ang dapat gamitin para sa blog posts na bihirang magbago?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q1" value="a"> <code>getServerSideProps</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="b"> <code>getStaticProps</code></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="c"> Client-side fetch lang</label>
+        </div>
+        <div class="quiz-feedback" id="feedback1"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">2. Ano ang ginagawa ng <code>revalidate: 60</code> sa getStaticProps?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q2" value="a"> Nire-reload ang page every 60 seconds sa browser</label>
+          <label class="quiz-option"><input type="radio" name="q2" value="b"> Sine-serve ang cached page at ni-re-revalidate sa background every 60s</label>
+          <label class="quiz-option"><input type="radio" name="q2" value="c"> Pinipigilan ang pag-fetch ng data within 60 seconds</label>
+        </div>
+        <div class="quiz-feedback" id="feedback2"></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-question">3. Aling function ang ginagamit para tukuyin ang mga dynamic paths na ie-generate?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q3" value="a"> <code>getStaticPaths</code></label>
+          <label class="quiz-option"><input type="radio" name="q3" value="b"> <code>getDynamicPaths</code></label>
+          <label class="quiz-option"><input type="radio" name="q3" value="c"> <code>getPaths</code></label>
+        </div>
+        <div class="quiz-feedback" id="feedback3"></div>
+      </div>
+
+      <button class="quiz-submit" onclick="checkQuiz()">Check Answers</button>
+
+      <!-- ======== PROJECT ======== -->
+      <div class="project">
+        <h3>Mini-Project: Blog with SSG + ISR</h3>
+        <p>Ikonekta ang iyong Next.js portfolio sa Laravel API:</p>
+        <ul>
+          <li>Gumawa ng Blog list page gamit ang <code>getStaticProps</code></li>
+          <li>Gumawa ng individual post page gamit ang <code>getStaticPaths</code> + <code>getStaticProps</code></li>
+          <li>Magdagdag ng <code>revalidate: 60</code> para sa ISR</li>
+          <li>Gumawa ng About page na kumukuha ng data mula sa Laravel API</li>
+          <li>I-test — magdagdag ng bagong post sa Laravel at tingnan kung lalabas ito pagkatapos ng 60 seconds</li>
+        </ul>
+      </div>
+
+      <!-- ======== SUMMARY ======== -->
+      <h2>Summary</h2>
+      <ul>
+        <li><code>getStaticProps</code> — SSG, sa build time, pinakamabilis</li>
+        <li><code>getStaticPaths</code> — para sa dynamic routes na may SSG</li>
+        <li><code>revalidate</code> — ISR, periodic background revalidation</li>
+        <li><code>getServerSideProps</code> — SSR, sa bawat request, real-time</li>
+        <li>Client-side fetching (SWR) — para sa interactive data sa browser</li>
+      </ul>
+
+      <div class="info">
+        <strong>Next Steps</strong>
+        Sa susunod na lesson (0013), matututunan mo ang <strong>API Routes</strong> — kung paano gumawa ng backend endpoints sa loob mismo ng iyong Next.js app!
+      </div>
+
+      <div class="lesson-nav"></div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../assets/lessons-data.js"></script>
+<script src="../assets/lesson-nav.js"></script>
+<script src="../assets/sidebar.js"></script>
+<script>
+  function checkQuiz() {
+    var answers = { q1: 'b', q2: 'b', q3: 'a' };
+    for (var key in answers) {
+      var sel = document.querySelector('input[name="' + key + '"]:checked');
+      var fb = document.getElementById('feedback' + key.slice(1));
+      if (!sel) { fb.textContent = 'Please select an answer!'; fb.className = 'quiz-feedback incorrect'; continue; }
+      if (sel.value === answers[key]) {
+        fb.textContent = '\u2705 Tama! ' + (key === 'q1' ? 'Ang getStaticProps ang pinakamabilis para sa static content.' : key === 'q2' ? 'Ang revalidate ay ISR — cached page, background refresh.' : 'Ang getStaticPaths ang nagtatakda kung aling dynamic pages ang ie-generate.');
+        fb.className = 'quiz-feedback correct';
+      } else {
+        fb.textContent = '\u274C Hindi tama. ' + (key === 'q1' ? 'Hint: Hindi ito yung sa bawat request o client-side.' : key === 'q2' ? 'Hint: Hindi ito browser-level reload.' : 'Hint: Ang function name ay may "Paths" sa dulo.');
+        fb.className = 'quiz-feedback incorrect';
+      }
+    }
+  }
+</script>
+</body>
+</html>
