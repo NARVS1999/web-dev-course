@@ -9,7 +9,10 @@
   var currentIdx = -1;
 
   for (var i = 0; i < LESSONS.length; i++) {
-    if (LESSONS[i].id === currentId) { currentIdx = i; break; }
+    if (LESSONS[i].id === currentId) {
+      currentIdx = i;
+      break;
+    }
   }
 
   if (currentIdx < 0) return;

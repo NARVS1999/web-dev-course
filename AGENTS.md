@@ -19,10 +19,10 @@ Edit `teach/assets/lessons-data.js` to add/remove lessons. That file defines `wi
 ## Script load order (every lesson, bottom of `<body>`)
 ```html
 <script src="../assets/lessons-data.js"></script>
+<script src="../assets/lesson-utils.js"></script>
 <script src="../assets/lesson-nav.js"></script>
-<script src="../assets/sidebar.js"></script>
 ```
-Order matters: `lessons-data.js` first (defines `window.LESSONS`), then `lesson-nav.js` + `sidebar.js` (both read it).
+Order matters: `lessons-data.js` first (defines `window.LESSONS`), then `lesson-utils.js` (handles sidebar), then `lesson-nav.js` (handles navigation links).
 
 ## ID extraction convention
 Both nav scripts derive the current lesson ID via `filename.split('-')[0]` — so filenames must start with the ID (e.g., `0011-nextjs-foundations.html`).
@@ -37,7 +37,7 @@ Both nav scripts derive the current lesson ID via `filename.split('-')[0]` — s
 - `teach/lessons/` — all 20 lesson HTML files (0001–0020)
 - `teach/reference/` — 5 cheatsheets (HTML, CSS, JS, SQL, Git)
 - `teach/learning-records/` — 7 records (0001–0007 only; 0008–0014 were never recorded)
-- `teach/assets/` — style.css, lessons-data.js, lesson-nav.js, sidebar.js
+- `teach/assets/` — style.css, lessons-data.js, lesson-utils.js, lesson-nav.js
 - `guide.md` — the high-level roadmap (stable reference, not stale)
 
 ## Constraints to honor

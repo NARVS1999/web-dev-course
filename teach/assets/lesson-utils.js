@@ -24,20 +24,20 @@
     var cls = 'sidebar-link';
     if (l.id === currentId) cls += ' current';
 
-    html +=
+    html +
       '<li><a href="' + l.file + '" class="' + cls + '">' +
         '<span class="sidebar-num">' + l.id + '</span>' +
         '<span class="sidebar-title">' + l.title + '</span>' +
       '</a></li>';
   }
 
-  html +=
+  html +
       '</ul></nav>' +
     '</div>';
 
   if (currentIdx >= 0 && currentIdx < LESSONS.length - 1) {
     var next = LESSONS[currentIdx + 1];
-    html +=
+    html +
       '<div class="sidebar-featured">' +
         '<div class="featured-label">Next Up</div>' +
         '<a href="' + next.file + '" class="featured-link">' +
@@ -48,7 +48,7 @@
 
   sidebar.innerHTML = html;
 
-  // Nav link close on click
+  // Nav link close on click for mobile
   var links = sidebar.querySelectorAll('.sidebar-link');
   for (var j = 0; j < links.length; j++) {
     links[j].addEventListener('click', function() {
@@ -104,6 +104,7 @@
     });
   }
 
+  // Create overlay
   var overlay = document.createElement('div');
   overlay.className = 'sidebar-overlay';
   overlay.id = 'sidebarOverlay';
