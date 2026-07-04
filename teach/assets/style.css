@@ -229,20 +229,89 @@ body {
   text-decoration: underline;
 }
 
-/* Responsive */
+/* Hamburger */
+.sidebar-close {
+  display: none;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 4px 8px;
+  line-height: 1;
+  border-radius: 6px;
+  transition: all 0.15s;
+  z-index: 2;
+}
+.sidebar-close:hover {
+  color: var(--text);
+  background: var(--accent-light);
+}
+
+.hamburger {
+  display: none;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 6px 10px;
+  font-size: 1.2rem;
+  color: var(--text);
+  transition: all 0.2s;
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+.hamburger:hover {
+  background: var(--accent-light);
+}
+
+/* Sidebar overlay (mobile only) */
+.sidebar-overlay {
+  display: none;
+}
+
+/* Responsive ≤ 800px — hamburger + slide-in sidebar */
 @media (max-width: 800px) {
   .lesson-layout {
     grid-template-columns: 1fr;
   }
   .lesson-sidebar {
-    position: static;
-    height: auto;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    padding: 1rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    height: 100vh;
+    width: 260px;
+    border-right: 1px solid var(--border);
+    border-bottom: none;
+    padding: 2rem 0;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+  }
+  .sidebar-open .lesson-sidebar {
+    transform: translateX(0);
+  }
+  .sidebar-open .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    background: rgba(0,0,0,0.4);
+  }
+  .sidebar-close {
+    display: block;
+  }
+  .hamburger {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
   .lesson-main {
-    padding: 1.5rem 1rem 2rem;
+    padding: 1.25rem 1rem 2rem;
   }
 }
 
@@ -561,17 +630,71 @@ tr:last-child td {
 
 /* Responsive */
 @media (max-width: 600px) {
-  body { padding: 1rem; }
-  h1 { font-size: 1.75rem; }
-  pre { font-size: 0.8rem; padding: 1rem; }
-  table { font-size: 0.8rem; }
+  body { padding: 0; }
+  h1 { font-size: 1.6rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.1rem; }
+  p { font-size: 0.95rem; }
+  pre { font-size: 0.75rem; padding: 0.75rem; }
+  table { font-size: 0.75rem; display: block; overflow-x: auto; }
+  code { font-size: 0.8em; }
+
+  .lesson-sidebar {
+    padding: 0.75rem;
+  }
+  .lesson-main {
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  .sidebar-link {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+  }
+  .sidebar-num {
+    min-width: 2em;
+    font-size: 0.7rem;
+  }
+  .theme-toggle {
+    padding: 6px 10px;
+    font-size: 1rem;
+  }
+  .sidebar-featured {
+    margin: 1rem 0.75rem 0;
+    padding: 0.75rem;
+  }
+
+  .quiz-item {
+    padding: 1rem;
+  }
+  .quiz-option {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+  }
+  .quiz-submit {
+    width: 100%;
+    padding: 0.6rem 1rem;
+  }
+
+  .step {
+    gap: 0.75rem;
+  }
+  .step-number {
+    width: 1.6rem;
+    height: 1.6rem;
+    font-size: 0.75rem;
+  }
+
+  .project {
+    padding: 1rem;
+  }
 
   .lesson-nav {
     flex-direction: column;
     align-items: stretch;
   }
-
   .nav-link {
     justify-content: center;
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
   }
 }

@@ -4,11 +4,15 @@
   var sidebar = document.getElementById('lesson-sidebar');
   if (!sidebar) return;
 
+  var main = document.querySelector('.lesson-main');
+  var layout = document.querySelector('.lesson-layout');
+
   var filename = window.location.pathname.split('/').pop() || '';
   var currentId = filename.split('-')[0];
   var currentIdx = -1;
 
   var html =
+    '<button class="sidebar-close" id="sidebarClose" title="Close sidebar">&times;</button>' +
     '<div class="sidebar-section">' +
       '<div class="sidebar-header">' +
         'Course' +
@@ -47,7 +51,39 @@
 
   sidebar.innerHTML = html;
 
-  // Theme toggle
+  // ── Hamburger + overlay ──
+  if (main) {
+    var hamburger = document.createElement('button');
+    hamburger.className = 'hamburger';
+    hamburger.id = 'hamburgerBtn';
+    hamburger.setAttribute('aria-label', 'Toggle sidebar');
+    hamburger.innerHTML = '\u2630 &nbsp;Lessons';
+    main.insertBefore(hamburger, main.firstChild);
+  }
+
+  if (layout) {
+    var overlay = document.createElement('div');
+    overlay.className = 'sidebar-overlay';
+    overlay.id = 'sidebarOverlay';
+    layout.appendChild(overlay);
+  }
+
+  function openSidebar() {
+    if (layout) layout.classList.add('sidebar-open');
+  }
+  function closeSidebar() {
+    if (layout) layout.classList.remove('sidebar-open');
+  }
+
+  var ham = document.getElementById('hamburgerBtn');
+  var ov = document.getElementById('sidebarOverlay');
+  var closeBtn = document.getElementById('sidebarClose');
+
+  if (ham) ham.addEventListener('click', openSidebar);
+  if (ov) ov.addEventListener('click', closeSidebar);
+  if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+
+  // ── Theme toggle ──
   var saved = localStorage.getItem('theme');
   if (saved === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
