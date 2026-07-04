@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Development Course</title>
+    <link rel="stylesheet" href="teach/assets/style.css">
+    <script>if (localStorage.getItem("theme") === "dark") document.documentElement.setAttribute("data-theme", "dark");</script>
+    <style>
+        .landing {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .landing h1 {
+            font-size: 2.75rem;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+        }
+
+        .landing .subtitle {
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            color: var(--muted);
+            margin-bottom: 2rem;
+        }
+
+        .landing .desc {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+            text-align: left;
+        }
+
+        .landing .desc li {
+            margin-bottom: 0.6rem;
+        }
+
+        .btn-start {
+            display: inline-block;
+            font-family: var(--font-sans);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            background: var(--accent);
+            padding: 0.9rem 2.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .btn-start:hover {
+            background: var(--accent-dark);
+        }
+
+        .landing .phases {
+            margin-top: 3rem;
+            text-align: left;
+        }
+
+        .phase-item {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .phase-num {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--muted);
+            min-width: 5.5em;
+        }
+
+        .phase-name {
+            flex: 1;
+        }
+
+        .phase-count {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .theme-top {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 6px 12px;
+            font-size: 1rem;
+            color: var(--muted);
+            transition: all 0.2s;
+            font-family: var(--font-sans);
+        }
+
+        .theme-top:hover {
+            color: var(--text);
+            background: var(--accent-light);
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-top" id="themeToggle" title="Toggle theme">&#9788;</button>
+
+    <div class="landing">
+        <h1>Web Development Course</h1>
+        <p class="subtitle">Zero to freelancing-ready &mdash; 20 lessons, all free, all local</p>
+
+        <ul class="desc">
+            <li>Mula sa <strong>HTML</strong> hanggang sa <strong>React Native</strong> &mdash; buong full-stack journey
+            </li>
+            <li>Mga tech na matututunan mo: HTML, CSS, JavaScript, Git, MySQL, Laravel, Next.js, React Native</li>
+            <li>Bawat lesson ay may quiz, mini-project, at practical examples</li>
+            <li>Lahat ng tools ay libre at pwedeng i-run sa Windows PC mo</li>
+            <li>Kasama ang freelancing guide para makapagsimula na kumita</li>
+        </ul>
+
+        <a href="teach/lessons/0001-html-foundations.html" class="btn-start">Start the Course &rarr;</a>
+
+        <div class="phases">
+            <div class="phase-item">
+                <span class="phase-num">Phase 1</span>
+                <span class="phase-name">Frontend Fundamentals &mdash; HTML &middot; CSS &middot; JS &middot; Git</span>
+                <span class="phase-count">4 lessons</span>
+            </div>
+            <div class="phase-item">
+                <span class="phase-num">Phase 2</span>
+                <span class="phase-name">Backend &amp; Database &mdash; MySQL &middot; Laravel</span>
+                <span class="phase-count">6 lessons</span>
+            </div>
+            <div class="phase-item">
+                <span class="phase-num">Phase 3</span>
+                <span class="phase-name">Advanced Frontend &mdash; Next.js</span>
+                <span class="phase-count">4 lessons</span>
+            </div>
+            <div class="phase-item">
+                <span class="phase-num">Phase 4</span>
+                <span class="phase-name">Mobile &amp; Deployment &mdash; React Native &middot; Freelancing</span>
+                <span class="phase-count">6 lessons</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var btn = document.getElementById('themeToggle');
+            if (btn) {
+                btn.addEventListener('click', function () {
+                    var html = document.documentElement;
+                    var isDark = html.getAttribute('data-theme') === 'dark';
+                    if (isDark) {
+                        html.removeAttribute('data-theme');
+                        localStorage.setItem('theme', 'light');
+                    } else {
+                        html.setAttribute('data-theme', 'dark');
+                        localStorage.setItem('theme', 'dark');
+                    }
+                });
+            }
+        })();
+    </script>
+</body>
+
+</html>
